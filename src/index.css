@@ -1,0 +1,200 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Siftera - Blue & White Professional Theme with Gold Highlights */
+
+@layer base {
+  :root {
+    --background: 215 100% 98%;
+    --foreground: 215 25% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 15%;
+
+    --primary: 214 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 214 100% 90%;
+
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 215 25% 15%;
+
+    --muted: 214 32% 95%;
+    --muted-foreground: 215 13% 45%;
+
+    --accent: 214 100% 42%;
+    --accent-foreground: 0 0% 100%;
+
+    --success: 142 70% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 5%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 85%;
+    --input: 0 0% 100%;
+    --ring: 214 100% 50%;
+
+    --radius: 0.75rem;
+
+    /* Gold theme for badges and achievements */
+    --gold-primary: 45 95% 50%;
+    --gold-light: 45 90% 65%;
+    --gold-dark: 45 80% 35%;
+    --gold-text: 45 100% 20%;
+    
+    --gradient-primary: linear-gradient(135deg, hsl(214 100% 50%), hsl(214 100% 70%));
+    --gradient-secondary: linear-gradient(135deg, hsl(214 32% 95%), hsl(214 32% 90%));
+    --gradient-gold: linear-gradient(135deg, hsl(45 95% 50%), hsl(45 90% 65%), hsl(45 95% 50%));
+    --shadow-glow: 0 0 20px hsl(214 100% 50% / 0.2);
+    --shadow-gold: 0 4px 20px hsl(45 95% 50% / 0.3);
+
+    --sidebar-background: 214 32% 95%;
+    --sidebar-foreground: 215 25% 15%;
+    --sidebar-primary: 214 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 214 32% 90%;
+    --sidebar-accent-foreground: 215 25% 15%;
+    --sidebar-border: 214 32% 85%;
+    --sidebar-ring: 214 100% 50%;
+  }
+
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 45 30% 90%;
+
+    --card: 0 0% 10%;
+    --card-foreground: 45 30% 90%;
+
+    --popover: 0 0% 12%;
+    --popover-foreground: 45 30% 90%;
+
+    --primary: 45 90% 55%;
+    --primary-foreground: 0 0% 5%;
+    --primary-glow: 45 85% 65%;
+
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 45 30% 90%;
+
+    --muted: 0 0% 18%;
+    --muted-foreground: 45 10% 60%;
+
+    --accent: 45 80% 45%;
+    --accent-foreground: 0 0% 5%;
+
+    --success: 142 70% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 5%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 45 20% 20%;
+    --input: 0 0% 15%;
+    --ring: 45 90% 55%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(45 90% 55%), hsl(45 85% 65%));
+    --gradient-secondary: linear-gradient(135deg, hsl(0 0% 12%), hsl(0 0% 18%));
+    --gradient-gold: linear-gradient(135deg, hsl(45 90% 45%), hsl(45 100% 60%), hsl(45 90% 45%));
+    --shadow-glow: 0 0 30px hsl(45 90% 55% / 0.3);
+    --shadow-gold: 0 4px 20px hsl(45 90% 55% / 0.2);
+
+    --sidebar-background: 214 32% 95%;
+    --sidebar-foreground: 215 25% 15%;
+    --sidebar-primary: 214 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 214 32% 90%;
+    --sidebar-accent-foreground: 215 25% 15%;
+    --sidebar-border: 214 32% 85%;
+    --sidebar-ring: 214 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Gold Badge and Achievement Utilities */
+@layer utilities {
+  .gold-icon {
+    color: hsl(var(--gold-primary));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+  
+  .gold-badge {
+    background: var(--gradient-gold);
+    color: hsl(var(--gold-text));
+    border: 1px solid hsl(var(--gold-dark));
+    box-shadow: var(--shadow-gold);
+    font-weight: 600;
+  }
+  
+  .gold-highlight {
+    background: hsl(var(--gold-light) / 0.2);
+    border: 1px solid hsl(var(--gold-primary) / 0.3);
+  }
+  
+  .trophy-gold {
+    color: hsl(var(--gold-primary));
+    filter: drop-shadow(0 0 8px hsl(var(--gold-primary) / 0.5));
+  }
+  
+  .achievement-glow {
+    animation: achievement-glow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes achievement-glow {
+    from {
+      filter: drop-shadow(0 0 5px hsl(var(--gold-primary) / 0.5));
+    }
+    to {
+      filter: drop-shadow(0 0 15px hsl(var(--gold-primary) / 0.8));
+    }
+  }
+
+  /* Gradient animation */
+  .animate-gradient {
+    background-size: 200% auto;
+    animation: gradient-shift 3s linear infinite;
+  }
+  
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% center;
+    }
+    50% {
+      background-position: 100% center;
+    }
+    100% {
+      background-position: 0% center;
+    }
+  }
+
+  /* Slow bounce animation */
+  .animate-bounce-slow {
+    animation: bounce-slow 3s ease-in-out infinite;
+  }
+  
+  @keyframes bounce-slow {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+}
