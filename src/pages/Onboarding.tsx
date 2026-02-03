@@ -8,8 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { DomainSelector } from '@/components/DomainSelector';
-
-type Domain = 'Sales' | 'CRM';
+import { type Domain } from '@/lib/constants/domains';
 
 const Onboarding = () => {
   const { user } = useAuth();
@@ -22,7 +21,7 @@ const Onboarding = () => {
     phone: '',
     email: '',
     designation: '',
-    domain: 'Sales' as Domain,
+    domain: 'sales' as Domain,
   });
 
   const handleNext = () => {
