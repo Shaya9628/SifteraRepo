@@ -10,6 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { StreamlinedSignUp } from '@/components/auth/StreamlinedSignUp';
+import { FcGoogle } from 'react-icons/fc';
+import { signInWithGoogle } from '@/lib/auth/googleAuth';
 import { z } from 'zod';
 
 // Validation schemas
@@ -38,7 +40,7 @@ const Auth = () => {
 
         if (profile) {
           // If user has domain, go to dashboard, otherwise complete setup
-          if (profile.domain || profile.selected_domain) {
+          if (profile.selected_domain) {
             navigate('/dashboard');
           } else {
             // Skip onboarding, user already has basic info from sign-up
@@ -52,7 +54,7 @@ const Auth = () => {
               id: user.id,
               full_name: user.user_metadata?.full_name || user.email?.split('@')[0],
               email: user.email,
-              domain: user.user_metadata?.domain || 'general',
+              selected_domain: user.user_metadata?.domain || 'general',
               phone: user.user_metadata?.phone,
             });
           navigate('/dashboard');
@@ -171,43 +173,78 @@ const Auth = () => {
             </TabsList>
             
             <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
-                  <Input
-                    id="signin-email"
-                    name="email"
-                    type="email"
-                    placeholder="hr@company.com"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
-                  <Input
-                    id="signin-password"
-                    name="password"
-                    type="password"
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Signing in...' : 'Sign In'}
+              <div className="space-y-6">
+                {/* Google Sign-In Button */}
+                <Button 
+                  onClick={async () => {
+                    setIsLoading(true);
+                    const { error } = await signInWithGoogle();
+                    if (error) {
+                      toast({
+                        title: 'Google Sign-In Failed',
+                        description: 'Please try again.',
+                        variant: 'destructive',
+                      });
+                    }
+                    setIsLoading(false);
+                  }}
+                  variant="outline" 
+                  className="w-full h-12 text-base"
+                  disabled={isLoading}
+                >
+                  <FcGoogle className="mr-3 h-5 w-5" />
+                  Continue with Google
                 </Button>
-                
-                <div className="text-center">
-                  <button
-                    type="button"
-                    onClick={() => setShowForgotPassword(true)}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Forgot Password?
-                  </button>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    If you forgot your password, click on 'Forgot Password' to reset it.
-                  </p>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      Or continue with email
+                    </span>
+                  </div>
                 </div>
-              </form>
+
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-email">Email</Label>
+                    <Input
+                      id="signin-email"
+                      name="email"
+                      type="email"
+                      placeholder="hr@company.com"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-password">Password</Label>
+                    <Input
+                      id="signin-password"
+                      name="password"
+                      type="password"
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? 'Signing in...' : 'Sign In'}
+                  </Button>
+                  
+                  <div className="text-center">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPassword(true)}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      Forgot Password?
+                    </button>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      If you forgot your password, click on 'Forgot Password' to reset it.
+                    </p>
+                  </div>
+                </form>
+              </div>
               
               {showForgotPassword && (
                 <div className="mt-4 p-4 border rounded-lg bg-secondary/20">
