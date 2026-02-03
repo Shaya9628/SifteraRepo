@@ -1,20 +1,15 @@
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable';
 
 export const signInWithGoogle = async () => {
   try {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
-      },
+    const result = await lovable.auth.signInWithOAuth('google', {
+      redirect_uri: `${window.location.origin}/dashboard`,
     });
 
-    if (error) throw error;
-    return { data, error: null };
+    if (result?.error) throw result.error;
+
+    return { data: result, error: null };
   } catch (error) {
     console.error('Google sign-in error:', error);
     return { data: null, error };
