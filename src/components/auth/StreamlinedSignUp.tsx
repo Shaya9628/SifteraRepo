@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FcGoogle } from 'react-icons/fc';
-import { signInWithGoogle } from '@/lib/auth/googleAuth';
+import { GoogleLoginButton } from './GoogleLoginButton';
 import { GLOBAL_DOMAINS, COUNTRY_CODES, type Domain, type CountryCode } from '@/lib/constants/domains';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -37,27 +37,7 @@ export function StreamlinedSignUp({ onSuccess }: StreamlinedSignUpProps) {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGoogleSignIn = async () => {
-    try {
-      setIsLoading(true);
-      const { error } = await signInWithGoogle();
-      if (error) {
-        toast({
-          title: 'Google Sign-In Failed',
-          description: error.message,
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to sign in with Google. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,15 +92,7 @@ export function StreamlinedSignUp({ onSuccess }: StreamlinedSignUpProps) {
   return (
     <div className="space-y-6">
       {/* Google Sign-In Button */}
-      <Button 
-        onClick={handleGoogleSignIn}
-        variant="outline" 
-        className="w-full h-12 text-base"
-        disabled={isLoading}
-      >
-        <FcGoogle className="mr-3 h-5 w-5" />
-        Continue with Google
-      </Button>
+      <GoogleLoginButton />
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">

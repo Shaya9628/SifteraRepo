@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 // Error boundary component
 class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean; error: any}> {
@@ -49,7 +50,9 @@ const root = createRoot(document.getElementById("root")!);
 try {
   root.render(
     <ErrorBoundary>
-      <App />
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ""}>
+        <App />
+      </GoogleOAuthProvider>
     </ErrorBoundary>
   );
 } catch (error) {

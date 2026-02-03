@@ -245,7 +245,7 @@ const UnifiedResumeAnalysis = ({ resumeId, resumeText, candidateName, department
       let { error: reportError } = await supabase.from('assessment_reports').insert(extendedReportData);
       
       // If that fails (likely due to missing columns), fall back to basic data
-      if (reportError && reportError.message?.includes('column') && reportError.message?.includes('does not exist')) {
+      if (reportError && (reportError.code === 'PGRST204' || (reportError.message?.includes('column') && reportError.message?.includes('does not exist')))) {
         console.log('New fields not available, using basic report structure');
         const { error: fallbackError } = await supabase.from('assessment_reports').insert(basicReportData);
         reportError = fallbackError;

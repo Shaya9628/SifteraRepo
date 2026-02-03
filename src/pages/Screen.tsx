@@ -46,6 +46,44 @@ const Screen = () => {
   const [scorecardCompleted, setScorecardCompleted] = useState(false);
   const [redFlagsCompleted, setRedFlagsCompleted] = useState(false);
   const [callSimCompleted, setCallSimCompleted] = useState(false);
+  const [showStepTransition, setShowStepTransition] = useState(false);
+  const [transitionMessage, setTransitionMessage] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const handleScorecardComplete = () => {
+    setShowStepTransition(true);
+    setTransitionMessage('Great job! Now let\'s check for any red flags in the resume...');
+    
+    setTimeout(() => {
+      setScorecardCompleted(true);
+      setActiveTab('red-flags');
+      setShowStepTransition(false);
+    }, 3000);
+  };
+
+  const handleRedFlagsComplete = () => {
+    setShowStepTransition(true);
+    setTransitionMessage('📞 Get ready to call the candidate! Prepare for the screening call...');
+    
+    setTimeout(() => {
+      setRedFlagsCompleted(true);
+      setActiveTab('call');
+      setShowStepTransition(false);
+    }, 4000);
+  };
+
+  const handleCallComplete = () => {
+    setShowStepTransition(true);
+    setTransitionMessage('🤖 AI is analyzing your assessment... This might take a moment...');
+    setIsAnalyzing(true);
+    
+    setTimeout(() => {
+      setCallSimCompleted(true);
+      setActiveTab('ai-results');
+      setShowStepTransition(false);
+      setIsAnalyzing(false);
+    }, 5000);
+  };
 
   useEffect(() => {
     if (user && id) {
@@ -367,6 +405,63 @@ const Screen = () => {
 
         {/* Screening Tools */}
         <div className="lg:col-span-2">
+          {/* Step Transition Animation */}
+          {showStepTransition && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+              <Card className="w-full max-w-md mx-4">
+                <CardContent className="p-8 text-center">
+                  <div className="space-y-6">
+                    {isAnalyzing ? (
+                      <div className="flex items-center justify-center">
+                        <div className="relative">
+                          <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-2xl animate-pulse">🤖</span>
+                          </div>
+                        </div>
+                      </div>
+                    ) : transitionMessage.includes('📞') ? (
+                      <div className="flex items-center justify-center">
+                        <div className="relative">
+                          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center animate-pulse">
+                            <span className="text-3xl animate-bounce">📞</span>
+                          </div>
+                          <div className="absolute -inset-4 border-2 border-green-300 rounded-full animate-ping"></div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center">
+                        <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center animate-pulse">
+                          <span className="text-2xl animate-spin">⚡</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2">
+                        {isAnalyzing ? 'Analyzing Your Assessment' : 
+                         transitionMessage.includes('📞') ? 'Prepare for Screening Call' :
+                         'Moving to Next Step'}
+                      </h3>
+                      <p className="text-muted-foreground">{transitionMessage}</p>
+                      
+                      {isAnalyzing && (
+                        <div className="mt-4 space-y-2">
+                          <div className="flex justify-center items-center space-x-1">
+                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                          </div>
+                          <p className="text-sm text-muted-foreground">Processing your responses...</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+          
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-4 mb-6">
               <TabsTrigger value="scorecard"><Target className="w-4 h-4 mr-2" />1. Score Card</TabsTrigger>
@@ -379,7 +474,7 @@ const Screen = () => {
               <ScreeningScorecard 
                 resumeId={resume.id} 
                 challengeMode={challengeMode}
-                onComplete={() => { setScorecardCompleted(true); setActiveTab('red-flags'); }}
+                onComplete={handleScorecardComplete}
               />
             </TabsContent>
 
@@ -387,7 +482,7 @@ const Screen = () => {
               <RedFlagDetector 
                 resumeId={resume.id}
                 candidateName={resume.candidate_name}
-                onComplete={() => { setRedFlagsCompleted(true); setActiveTab('call'); }}
+                onComplete={handleRedFlagsComplete}
               />
             </TabsContent>
 
@@ -396,7 +491,7 @@ const Screen = () => {
                 resumeId={resume.id}
                 candidateName={resume.candidate_name}
                 department={resume.department}
-                onComplete={() => { setCallSimCompleted(true); setActiveTab('ai-results'); }}
+                onComplete={handleCallComplete}
               />
             </TabsContent>
 

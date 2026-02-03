@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { StreamlinedSignUp } from '@/components/auth/StreamlinedSignUp';
 import { FcGoogle } from 'react-icons/fc';
-import { signInWithGoogle } from '@/lib/auth/googleAuth';
+import { GoogleLoginButton } from '@/components/auth/GoogleLoginButton';
 import { z } from 'zod';
 
 // Validation schemas
@@ -175,26 +175,7 @@ const Auth = () => {
             <TabsContent value="signin">
               <div className="space-y-6">
                 {/* Google Sign-In Button */}
-                <Button 
-                  onClick={async () => {
-                    setIsLoading(true);
-                    const { error } = await signInWithGoogle();
-                    if (error) {
-                      toast({
-                        title: 'Google Sign-In Failed',
-                        description: 'Please try again.',
-                        variant: 'destructive',
-                      });
-                    }
-                    setIsLoading(false);
-                  }}
-                  variant="outline" 
-                  className="w-full h-12 text-base"
-                  disabled={isLoading}
-                >
-                  <FcGoogle className="mr-3 h-5 w-5" />
-                  Continue with Google
-                </Button>
+                <GoogleLoginButton />
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">

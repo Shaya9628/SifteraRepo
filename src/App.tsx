@@ -17,6 +17,8 @@ import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import AIResults from "./pages/AIResults";
+import { ProfileCompletion } from "./pages/ProfileCompletion";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,8 +42,10 @@ const App = () => {
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route path="/profile-selection" element={<ProfileSelection />} />
+                <Route path="/profile-completion" element={<ProfileCompletion />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/dashboard/profile" element={<Profile />} />
+                <Route path="/dashboard/ai-results" element={<AIResults />} />
                 <Route path="/screen/:id" element={<Screen />} />
                 <Route path="/admin/auth" element={<AdminAuth />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
