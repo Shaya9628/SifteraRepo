@@ -43,7 +43,7 @@ const Hero = () => {
                 {/* Main Headline */}
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
                 <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
-                  Siftera
+                  Sifteraa
                 </span>
               </h1>
 
