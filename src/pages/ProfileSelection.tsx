@@ -15,6 +15,17 @@ const ProfileSelection = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [selectedDomain, setSelectedDomain] = useState<Domain>('general');
+
+  const handleBack = () => {
+    // React Router keeps an internal history index at window.history.state.idx.
+    // If the user landed here directly (no in-app history), navigate(-1) appears to do nothing.
+    const idx = (window.history.state as { idx?: number } | null)?.idx;
+    if (typeof idx === 'number' && idx > 0) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
   
   // Get data from Google authentication
   const { 
@@ -174,7 +185,7 @@ const ProfileSelection = () => {
         {/* Back Button */}
         <Button
           variant="ghost"
-          onClick={() => navigate(-1)}
+          onClick={handleBack}
           className="mb-4 flex items-center gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
