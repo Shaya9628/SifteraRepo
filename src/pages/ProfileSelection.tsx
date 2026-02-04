@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { DomainSelector } from '@/components/DomainSelector';
 import { GLOBAL_DOMAINS, type Domain } from '@/lib/constants/domains';
-
+import { ArrowLeft } from 'lucide-react';
 const ProfileSelection = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -171,6 +171,16 @@ const ProfileSelection = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-secondary/5 p-4">
       <div className="w-full max-w-4xl">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="mb-4 flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </Button>
+        
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">
             {fromGoogleAuth && isNewUser 

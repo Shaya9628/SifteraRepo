@@ -26,9 +26,9 @@ interface AssessmentReport {
   reasoning?: string;
   suitability_summary?: string;
   resumes?: {
-    file_name: string;
     candidate_name?: string;
-  };
+    file_path?: string;
+  } | null;
 }
 
 export default function AIResults() {
@@ -53,7 +53,6 @@ export default function AIResults() {
         .select(`
           *,
           resumes (
-            file_name,
             candidate_name
           )
         `)
@@ -78,13 +77,13 @@ export default function AIResults() {
             try {
               const { data: resumeData } = await supabase
                 .from('resumes')
-                .select('file_name, candidate_name')
+                .select('candidate_name, file_path')
                 .eq('id', report.resume_id)
                 .single();
               
               return {
                 ...report,
-                resumes: resumeData
+                resumes: resumeData ? { candidate_name: resumeData.candidate_name, file_path: resumeData.file_path } : null
               };
             } catch {
               return {
@@ -116,15 +115,15 @@ export default function AIResults() {
           .map(resume => ({
             id: `placeholder-${resume.id}`,
             resume_id: resume.id,
-            user_total_score: resume.user_total_score || 0,
-            ai_total_score: resume.ai_total_score || 0,
-            user_scores: resume.user_scores || {},
-            ai_scores: resume.ai_scores || {},
-            comparative_feedback: resume.comparative_feedback || {},
-            overall_feedback: resume.overall_feedback || 'Assessment completed. Detailed feedback available.',
-            created_at: resume.updated_at || resume.created_at,
+            user_total_score: 0,
+            ai_total_score: 0,
+            user_scores: {},
+            ai_scores: {},
+            comparative_feedback: {},
+            overall_feedback: 'Assessment completed. Detailed feedback available.',
+            created_at: resume.uploaded_at,
             resumes: {
-              file_name: resume.file_name,
+              file_path: resume.file_path,
               candidate_name: resume.candidate_name
             }
           }));
@@ -200,7 +199,7 @@ export default function AIResults() {
                     Assessment Report
                   </CardTitle>
                   <CardDescription>
-                    Resume: {selectedReport.resumes?.file_name || 'Unknown'}
+                    Resume: {selectedReport.resumes?.file_path?.split('/').pop() || selectedReport.resumes?.candidate_name || 'Unknown'}
                     {selectedReport.resumes?.candidate_name && (
                       <span> • Candidate: {selectedReport.resumes.candidate_name}</span>
                     )}
@@ -315,6 +314,8 @@ export default function AIResults() {
                   <div className="space-y-4">
                     {selectedReport.user_scores && Object.entries(selectedReport.user_scores).map(([category, userScore]) => {
                       const aiScore = selectedReport.ai_scores?.[category] || 0;
+                      const userScoreNum = typeof userScore === 'number' ? userScore : 0;
+                      const aiScoreNum = typeof aiScore === 'number' ? aiScore : 0;
                       return (
                         <div key={category} className="space-y-2">
                           <div className="flex justify-between items-center">
@@ -322,21 +323,21 @@ export default function AIResults() {
                               {category.replace('_', ' ')}
                             </span>
                             <div className="flex gap-4 text-sm">
-                              <span>Your: {userScore}</span>
-                              <span>AI: {aiScore}</span>
+                              <span>Your: {userScoreNum}</span>
+                              <span>AI: {aiScoreNum}</span>
                             </div>
                           </div>
                           <div className="flex gap-2">
                             <div className="flex-1 bg-muted rounded-full h-2">
                               <div 
-                                className="bg-blue-500 h-2 rounded-full" 
-                                style={{ width: `${Math.min(userScore, 100)}%` }}
+                                className="bg-primary h-2 rounded-full" 
+                                style={{ width: `${Math.min(userScoreNum, 100)}%` }}
                               />
                             </div>
                             <div className="flex-1 bg-muted rounded-full h-2">
                               <div 
-                                className="bg-green-500 h-2 rounded-full" 
-                                style={{ width: `${Math.min(aiScore, 100)}%` }}
+                                className="bg-accent h-2 rounded-full" 
+                                style={{ width: `${Math.min(aiScoreNum, 100)}%` }}
                               />
                             </div>
                           </div>
@@ -463,7 +464,7 @@ export default function AIResults() {
                     <div>
                       <CardTitle className="flex items-center gap-2">
                         <FileText className="w-5 h-5" />
-                        {report.resumes?.file_name || 'Assessment Report'}
+                        {report.resumes?.file_path?.split('/').pop() || report.resumes?.candidate_name || 'Assessment Report'}
                       </CardTitle>
                       <CardDescription>
                         {report.resumes?.candidate_name && (
