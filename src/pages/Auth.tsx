@@ -38,25 +38,15 @@ const Auth = () => {
           .single();
 
         if (profile) {
-          // If user has domain, go to dashboard, otherwise complete setup
-          if (profile.selected_domain) {
+          // If user has domain AND completed onboarding, go to dashboard
+          if (profile.selected_domain && profile.has_completed_onboarding) {
             navigate('/dashboard');
           } else {
-            // Redirect to profile selection for domain selection
-            navigate('/profile-selection', {
-              state: {
-                fromGoogleAuth: true,
-                isNewUser: !profile.selected_domain,
-                googleUserData: {
-                  fullName: profile.full_name || user.user_metadata?.full_name,
-                  email: profile.email || user.email,
-                  avatarUrl: profile.avatar_url || user.user_metadata?.avatar_url
-                }
-              }
-            });
+            // Redirect to onboarding for profile completion (includes domain selection)
+            navigate('/onboarding');
           }
         } else {
-          // Create basic profile and redirect to profile selection
+          // Create basic profile and redirect to onboarding
           await supabase
             .from('profiles')
             .upsert({
@@ -66,17 +56,7 @@ const Auth = () => {
               avatar_url: user.user_metadata?.avatar_url,
             });
           
-          navigate('/profile-selection', {
-            state: {
-              fromGoogleAuth: true,
-              isNewUser: true,
-              googleUserData: {
-                fullName: user.user_metadata?.full_name,
-                email: user.email,
-                avatarUrl: user.user_metadata?.avatar_url
-              }
-            }
-          });
+          navigate('/onboarding');
         }
       }
     };
