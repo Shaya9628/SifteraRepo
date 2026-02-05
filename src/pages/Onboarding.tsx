@@ -52,6 +52,7 @@ const Onboarding = () => {
           phone: formData.phone,
           email: formData.email,
           designation: formData.designation,
+          selected_domain: formData.domain, // Save domain to profile
           has_completed_onboarding: true,
         })
         .eq('id', user.id);
@@ -60,16 +61,14 @@ const Onboarding = () => {
 
       // Store domain in localStorage for immediate use
       localStorage.setItem('user_selected_domain', formData.domain);
-      
-      // Note: 'users' table doesn't exist in schema - domain is stored in profiles.selected_domain
-      // which is already updated above
 
       toast({
         title: 'Profile completed!',
         description: `Welcome to the HR Training Platform - ${formData.domain} Domain`,
       });
       
-      navigate('/profile-selection');
+      // Go directly to dashboard - no need for separate profile-selection page
+      navigate('/dashboard');
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
