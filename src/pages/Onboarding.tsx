@@ -88,10 +88,19 @@ const Onboarding = () => {
     e.preventDefault();
     if (!user) return;
 
+    if (!formData.phone.trim()) {
+      toast({
+        title: "Required field",
+        description: "Please enter your phone number",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!formData.designation.trim()) {
       toast({
         title: "Required field",
-        description: "Please enter your job title/designation",
+        description: "Please enter your job title",
         variant: "destructive",
       });
       return;
@@ -141,71 +150,100 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-secondary/5 p-4">
-      <div className="w-full max-w-2xl">
-        <Card>
-          <CardHeader>
-            <CardTitle>Complete your setup</CardTitle>
-            <CardDescription>
-              Choose your domain and confirm a few details to personalize your dashboard.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <DomainSelector
-                selectedDomain={formData.domain}
-                onDomainSelect={(domain) => setFormData({ ...formData, domain })}
-                showDescription={false}
-              />
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5 py-8 px-4">
+      <div className="w-full max-w-4xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">Complete Your Profile</h1>
+          <p className="text-muted-foreground">
+            Fill in your details and select your domain to personalize your experience
+          </p>
+        </div>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <Label htmlFor="full_name">Full Name</Label>
-                  <Input
-                    id="full_name"
-                    value={formData.full_name}
-                    disabled
-                    aria-disabled
-                  />
-                </div>
+        <Card className="border-0 shadow-lg">
+          <CardContent className="p-6 md:p-8">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Personal Information Section */}
+              <div className="space-y-4">
+                <h2 className="text-lg font-semibold border-b pb-2">Personal Information</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="full_name">Full Name <span className="text-destructive">*</span></Label>
+                    <Input
+                      id="full_name"
+                      value={formData.full_name}
+                      disabled
+                      className="bg-muted/50"
+                    />
+                  </div>
 
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={formData.email} disabled aria-disabled />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email Address <span className="text-destructive">*</span></Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      disabled
+                      className="bg-muted/50"
+                    />
+                  </div>
 
-                <div className="md:col-span-2">
-                  <Label htmlFor="designation">Job Title/Designation *</Label>
-                  <Input
-                    id="designation"
-                    value={formData.designation}
-                    onChange={(e) =>
-                      setFormData({ ...formData, designation: e.target.value })
-                    }
-                    placeholder="e.g., Sales Representative, Customer Service Manager"
-                    required
-                    disabled={initializing}
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number <span className="text-destructive">*</span></Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      placeholder="+1 (555) 000-0000"
+                      required
+                      disabled={initializing}
+                    />
+                  </div>
 
-                <div className="md:col-span-2">
-                  <Label htmlFor="phone">Phone Number (optional)</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    disabled={initializing}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="designation">Job Title <span className="text-destructive">*</span></Label>
+                    <Input
+                      id="designation"
+                      value={formData.designation}
+                      onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
+                      placeholder="e.g., Sales Manager, HR Executive"
+                      required
+                      disabled={initializing}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={initializing || loading}>
-                {initializing ? "Loading..." : loading ? "Saving..." : "Finish"}
+              {/* Domain Selection Section */}
+              <div className="space-y-4">
+                <h2 className="text-lg font-semibold border-b pb-2">Select Your Domain</h2>
+                <p className="text-sm text-muted-foreground">
+                  Choose the domain that best matches your professional focus
+                </p>
+                <DomainSelector
+                  selectedDomain={formData.domain}
+                  onDomainSelect={(domain) => setFormData({ ...formData, domain })}
+                  showDescription={false}
+                  title=""
+                />
+              </div>
+
+              {/* Submit Button */}
+              <Button 
+                type="submit" 
+                className="w-full h-12 text-base font-medium" 
+                disabled={initializing || loading}
+              >
+                {initializing ? "Loading..." : loading ? "Setting up your account..." : "Get Started"}
               </Button>
             </form>
           </CardContent>
         </Card>
+
+        <p className="text-center text-xs text-muted-foreground">
+          You can update your profile and domain preferences anytime from settings
+        </p>
       </div>
     </div>
   );
