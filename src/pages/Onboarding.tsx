@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +23,32 @@ const Onboarding = () => {
     designation: '',
     domain: 'sales' as Domain,
   });
+
+  // Check if user already has basic info from Google sign-in, skip to Step 2
+  useEffect(() => {
+    const checkExistingProfile = async () => {
+      if (!user) return;
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, email, designation')
+        .eq('id', user.id)
+        .single();
+      
+      if (profile?.full_name && profile?.email) {
+        // User has basic info (from Google), pre-fill and skip to domain selection
+        setFormData(prev => ({
+          ...prev,
+          full_name: profile.full_name || '',
+          email: profile.email || '',
+          designation: profile.designation || '',
+        }));
+        setCurrentStep(2); // Skip directly to domain selection
+      }
+    };
+    
+    checkExistingProfile();
+  }, [user]);
 
   const handleNext = () => {
     if (currentStep === 1 && (!formData.full_name || !formData.designation)) {
