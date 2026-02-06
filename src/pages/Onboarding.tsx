@@ -150,46 +150,68 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5 py-8 px-4">
-      <div className="w-full max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Complete Your Profile</h1>
-          <p className="text-muted-foreground">
-            Fill in your details and select your domain to personalize your experience
+    <div className="min-h-screen relative overflow-hidden py-8 px-4">
+      {/* Animated Background Blobs */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-0 -left-40 w-80 h-80 bg-primary/30 rounded-full blur-3xl animate-blob" />
+        <div className="absolute top-40 -right-40 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-blob animation-delay-2000" />
+        <div className="absolute -bottom-20 left-1/3 w-72 h-72 bg-primary-glow/20 rounded-full blur-3xl animate-blob animation-delay-4000" />
+      </div>
+
+      <div className="w-full max-w-4xl mx-auto space-y-6 animate-fade-in">
+        {/* Header with Gradient Text */}
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-sm font-medium mb-2">
+            <span className="emoji-pop">✨</span>
+            <span>Let's get you started</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gradient">
+            Complete Your Profile
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-md mx-auto">
+            Fill in your details and pick your vibe to personalize your experience 🚀
           </p>
         </div>
 
-        <Card className="border-0 shadow-lg">
+        <Card className="glass border-0 shadow-2xl glow-purple animate-scale-in">
           <CardContent className="p-6 md:p-8">
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Personal Information Section */}
               <div className="space-y-4">
-                <h2 className="text-lg font-semibold border-b pb-2">Personal Information</h2>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl emoji-pop">👤</span>
+                  <h2 className="text-xl font-bold">Personal Info</h2>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="full_name">Full Name <span className="text-destructive">*</span></Label>
+                  <div className="space-y-2 group">
+                    <Label htmlFor="full_name" className="text-sm font-semibold">
+                      Full Name <span className="text-destructive">*</span>
+                    </Label>
                     <Input
                       id="full_name"
                       value={formData.full_name}
                       disabled
-                      className="bg-muted/50"
+                      className="h-12 rounded-xl bg-muted/50 border-2 border-border/50 transition-all"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="email" className="text-sm font-semibold">
+                      Email Address <span className="text-destructive">*</span>
+                    </Label>
                     <Input
                       id="email"
                       type="email"
                       value={formData.email}
                       disabled
-                      className="bg-muted/50"
+                      className="h-12 rounded-xl bg-muted/50 border-2 border-border/50 transition-all"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="phone" className="text-sm font-semibold">
+                      Phone Number <span className="text-destructive">*</span>
+                    </Label>
                     <Input
                       id="phone"
                       type="tel"
@@ -198,11 +220,14 @@ const Onboarding = () => {
                       placeholder="+1 (555) 000-0000"
                       required
                       disabled={initializing}
+                      className="h-12 rounded-xl border-2 border-border/50 focus:border-primary focus:glow-purple transition-all"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="designation">Job Title <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="designation" className="text-sm font-semibold">
+                      Job Title <span className="text-destructive">*</span>
+                    </Label>
                     <Input
                       id="designation"
                       value={formData.designation}
@@ -210,6 +235,7 @@ const Onboarding = () => {
                       placeholder="e.g., Sales Manager, HR Executive"
                       required
                       disabled={initializing}
+                      className="h-12 rounded-xl border-2 border-border/50 focus:border-primary focus:glow-purple transition-all"
                     />
                   </div>
                 </div>
@@ -217,9 +243,12 @@ const Onboarding = () => {
 
               {/* Domain Selection Section */}
               <div className="space-y-4">
-                <h2 className="text-lg font-semibold border-b pb-2">Select Your Domain</h2>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl emoji-pop">🎯</span>
+                  <h2 className="text-xl font-bold">Pick Your Domain</h2>
+                </div>
                 <p className="text-sm text-muted-foreground">
-                  Choose the domain that best matches your professional focus
+                  Choose what matches your professional vibe ✨
                 </p>
                 <DomainSelector
                   selectedDomain={formData.domain}
@@ -232,19 +261,35 @@ const Onboarding = () => {
               {/* Submit Button */}
               <Button 
                 type="submit" 
-                className="w-full h-12 text-base font-medium" 
+                className="w-full h-14 text-lg font-bold rounded-xl bg-gradient-primary hover:opacity-90 transition-all animate-pulse-glow" 
                 disabled={initializing || loading}
               >
-                {initializing ? "Loading..." : loading ? "Setting up your account..." : "Get Started"}
+                {initializing ? (
+                  "Loading..."
+                ) : loading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin">⚡</span> Setting things up...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    Let's Go! <span className="emoji-pop">🚀</span>
+                  </span>
+                )}
               </Button>
             </form>
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs text-muted-foreground">
-          You can update your profile and domain preferences anytime from settings
+        <p className="text-center text-sm text-muted-foreground">
+          You can update your profile anytime from settings 💫
         </p>
       </div>
+
+      {/* Animation delay styles */}
+      <style>{`
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+      `}</style>
     </div>
   );
 };
