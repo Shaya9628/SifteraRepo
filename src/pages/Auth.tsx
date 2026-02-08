@@ -10,7 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { StreamlinedSignUp } from '@/components/auth/StreamlinedSignUp';
-import { FcGoogle } from 'react-icons/fc';
 import { GoogleLoginButton } from '@/components/auth/GoogleLoginButton';
 import { z } from 'zod';
 
@@ -22,7 +21,7 @@ const signInSchema = z.object({
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -39,31 +38,43 @@ const Auth = () => {
           .single();
 
         if (profile) {
-          // If user has domain, go to dashboard, otherwise complete setup
-          if (profile.selected_domain) {
+          // If user has domain AND completed onboarding, go to dashboard
+          if (profile.selected_domain && profile.has_completed_onboarding) {
             navigate('/dashboard');
           } else {
-            // Skip onboarding, user already has basic info from sign-up
-            navigate('/dashboard');
+            // Redirect to onboarding for profile completion (includes domain selection)
+            navigate('/onboarding');
           }
         } else {
-          // Create basic profile and go to dashboard
+          // Create basic profile and redirect to onboarding
           await supabase
             .from('profiles')
             .upsert({
               id: user.id,
               full_name: user.user_metadata?.full_name || user.email?.split('@')[0],
               email: user.email,
-              selected_domain: user.user_metadata?.domain || 'general',
-              phone: user.user_metadata?.phone,
+              avatar_url: user.user_metadata?.avatar_url,
             });
-          navigate('/dashboard');
+          
+          navigate('/onboarding');
         }
       }
     };
 
     checkUserStatus();
   }, [user, navigate]);
+
+  // Listen for auth state changes (handles OAuth redirect callback)
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        console.log('Auth state changed: SIGNED_IN');
+        // The user effect above will handle navigation
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -2,119 +2,144 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Siftera - Blue & White Professional Theme with Gold Highlights */
+/* Siftera - Gen-Z Vibrant Theme with Neon Gradients */
 
 @layer base {
   :root {
-    --background: 215 100% 98%;
-    --foreground: 215 25% 15%;
+    --background: 250 20% 98%;
+    --foreground: 250 30% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 250 30% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 250 30% 10%;
 
-    --primary: 214 100% 50%;
+    /* Vibrant Purple-Pink Primary */
+    --primary: 280 85% 60%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 214 100% 90%;
+    --primary-glow: 280 100% 75%;
 
-    --secondary: 214 32% 91%;
-    --secondary-foreground: 215 25% 15%;
+    --secondary: 250 30% 94%;
+    --secondary-foreground: 250 30% 10%;
 
-    --muted: 214 32% 95%;
-    --muted-foreground: 215 13% 45%;
+    --muted: 250 20% 94%;
+    --muted-foreground: 250 15% 45%;
 
-    --accent: 214 100% 42%;
+    /* Cyan Accent */
+    --accent: 180 90% 45%;
     --accent-foreground: 0 0% 100%;
 
-    --success: 142 70% 40%;
+    --success: 160 85% 40%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
+    --warning: 45 95% 55%;
     --warning-foreground: 0 0% 5%;
 
-    --destructive: 0 70% 50%;
+    --destructive: 350 85% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 85%;
+    --border: 250 25% 88%;
     --input: 0 0% 100%;
-    --ring: 214 100% 50%;
+    --ring: 280 85% 60%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
+
+    /* Gen-Z Neon Colors */
+    --neon-purple: 280 100% 65%;
+    --neon-pink: 330 100% 65%;
+    --neon-cyan: 180 100% 50%;
+    --neon-lime: 120 100% 50%;
+    --neon-orange: 25 100% 55%;
+
+    /* Vibrant Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(280 85% 60%), hsl(330 100% 65%));
+    --gradient-secondary: linear-gradient(135deg, hsl(180 90% 45%), hsl(200 100% 55%));
+    --gradient-neon: linear-gradient(135deg, hsl(280 100% 65%), hsl(180 100% 50%), hsl(330 100% 65%));
+    --gradient-sunset: linear-gradient(135deg, hsl(330 100% 65%), hsl(25 100% 55%), hsl(45 95% 55%));
+    --gradient-aurora: linear-gradient(135deg, hsl(280 100% 65%), hsl(180 100% 50%), hsl(120 100% 50%));
+    --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6));
+
+    /* Glow Effects */
+    --shadow-glow: 0 0 30px hsl(280 100% 65% / 0.3);
+    --shadow-neon: 0 0 40px hsl(180 100% 50% / 0.4);
+    --shadow-pink: 0 0 30px hsl(330 100% 65% / 0.3);
+    --shadow-soft: 0 20px 50px -12px hsl(250 30% 10% / 0.15);
 
     /* Gold theme for badges and achievements */
     --gold-primary: 45 95% 50%;
     --gold-light: 45 90% 65%;
     --gold-dark: 45 80% 35%;
     --gold-text: 45 100% 20%;
-    
-    --gradient-primary: linear-gradient(135deg, hsl(214 100% 50%), hsl(214 100% 70%));
-    --gradient-secondary: linear-gradient(135deg, hsl(214 32% 95%), hsl(214 32% 90%));
     --gradient-gold: linear-gradient(135deg, hsl(45 95% 50%), hsl(45 90% 65%), hsl(45 95% 50%));
-    --shadow-glow: 0 0 20px hsl(214 100% 50% / 0.2);
     --shadow-gold: 0 4px 20px hsl(45 95% 50% / 0.3);
 
-    --sidebar-background: 214 32% 95%;
-    --sidebar-foreground: 215 25% 15%;
-    --sidebar-primary: 214 100% 50%;
+    --sidebar-background: 250 25% 97%;
+    --sidebar-foreground: 250 30% 10%;
+    --sidebar-primary: 280 85% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 214 32% 90%;
-    --sidebar-accent-foreground: 215 25% 15%;
-    --sidebar-border: 214 32% 85%;
-    --sidebar-ring: 214 100% 50%;
+    --sidebar-accent: 250 30% 92%;
+    --sidebar-accent-foreground: 250 30% 10%;
+    --sidebar-border: 250 25% 88%;
+    --sidebar-ring: 280 85% 60%;
   }
 
   .dark {
-    --background: 0 0% 7%;
-    --foreground: 45 30% 90%;
+    --background: 250 25% 6%;
+    --foreground: 250 15% 95%;
 
-    --card: 0 0% 10%;
-    --card-foreground: 45 30% 90%;
+    --card: 250 25% 10%;
+    --card-foreground: 250 15% 95%;
 
-    --popover: 0 0% 12%;
-    --popover-foreground: 45 30% 90%;
+    --popover: 250 25% 12%;
+    --popover-foreground: 250 15% 95%;
 
-    --primary: 45 90% 55%;
-    --primary-foreground: 0 0% 5%;
-    --primary-glow: 45 85% 65%;
+    /* Vibrant Neon Primary in Dark */
+    --primary: 280 100% 70%;
+    --primary-foreground: 250 30% 5%;
+    --primary-glow: 280 100% 80%;
 
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 45 30% 90%;
+    --secondary: 250 20% 15%;
+    --secondary-foreground: 250 15% 95%;
 
-    --muted: 0 0% 18%;
-    --muted-foreground: 45 10% 60%;
+    --muted: 250 20% 18%;
+    --muted-foreground: 250 15% 60%;
 
-    --accent: 45 80% 45%;
-    --accent-foreground: 0 0% 5%;
+    /* Bright Cyan Accent */
+    --accent: 180 100% 55%;
+    --accent-foreground: 250 30% 5%;
 
-    --success: 142 70% 40%;
+    --success: 160 85% 50%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
+    --warning: 45 95% 55%;
     --warning-foreground: 0 0% 5%;
 
-    --destructive: 0 70% 50%;
+    --destructive: 350 85% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 45 20% 20%;
-    --input: 0 0% 15%;
-    --ring: 45 90% 55%;
+    --border: 250 20% 20%;
+    --input: 250 25% 12%;
+    --ring: 280 100% 70%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(45 90% 55%), hsl(45 85% 65%));
-    --gradient-secondary: linear-gradient(135deg, hsl(0 0% 12%), hsl(0 0% 18%));
-    --gradient-gold: linear-gradient(135deg, hsl(45 90% 45%), hsl(45 100% 60%), hsl(45 90% 45%));
-    --shadow-glow: 0 0 30px hsl(45 90% 55% / 0.3);
-    --shadow-gold: 0 4px 20px hsl(45 90% 55% / 0.2);
+    --gradient-primary: linear-gradient(135deg, hsl(280 100% 70%), hsl(330 100% 70%));
+    --gradient-secondary: linear-gradient(135deg, hsl(180 100% 55%), hsl(200 100% 60%));
+    --gradient-neon: linear-gradient(135deg, hsl(280 100% 70%), hsl(180 100% 55%), hsl(330 100% 70%));
+    --gradient-glass: linear-gradient(135deg, rgba(30,30,40,0.9), rgba(30,30,40,0.6));
 
-    --sidebar-background: 214 32% 95%;
-    --sidebar-foreground: 215 25% 15%;
-    --sidebar-primary: 214 100% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 214 32% 90%;
-    --sidebar-accent-foreground: 215 25% 15%;
-    --sidebar-border: 214 32% 85%;
-    --sidebar-ring: 214 100% 50%;
+    --shadow-glow: 0 0 40px hsl(280 100% 70% / 0.4);
+    --shadow-neon: 0 0 50px hsl(180 100% 55% / 0.5);
+    --shadow-pink: 0 0 40px hsl(330 100% 70% / 0.4);
+    --shadow-soft: 0 20px 50px -12px hsl(0 0% 0% / 0.5);
+
+    --sidebar-background: 250 25% 10%;
+    --sidebar-foreground: 250 15% 95%;
+    --sidebar-primary: 280 100% 70%;
+    --sidebar-primary-foreground: 250 30% 5%;
+    --sidebar-accent: 250 20% 15%;
+    --sidebar-accent-foreground: 250 15% 95%;
+    --sidebar-border: 250 20% 20%;
+    --sidebar-ring: 280 100% 70%;
   }
 }
 
@@ -124,12 +149,190 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
   }
 }
 
-/* Gold Badge and Achievement Utilities */
+/* Gen-Z Utilities */
 @layer utilities {
+  /* Glassmorphism */
+  .glass {
+    background: var(--gradient-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  .glass-strong {
+    background: var(--gradient-glass);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid hsl(var(--border) / 0.3);
+  }
+
+  /* Neon Glow Effects */
+  .glow-purple {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .glow-cyan {
+    box-shadow: var(--shadow-neon);
+  }
+
+  .glow-pink {
+    box-shadow: var(--shadow-pink);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px currentColor;
+  }
+
+  /* Gradient Text */
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-neon {
+    background: var(--gradient-neon);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-sunset {
+    background: var(--gradient-sunset);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Gradient Backgrounds */
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .bg-gradient-neon {
+    background: var(--gradient-neon);
+  }
+
+  .bg-gradient-aurora {
+    background: var(--gradient-aurora);
+  }
+
+  .bg-gradient-sunset {
+    background: var(--gradient-sunset);
+  }
+
+  /* Animated Gradient */
+  .animate-gradient {
+    background-size: 200% auto;
+    animation: gradient-shift 3s ease infinite;
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Floating Animation */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+
+  /* Pulse Glow */
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.4); }
+    50% { box-shadow: 0 0 40px hsl(var(--primary) / 0.7); }
+  }
+
+  /* Shimmer Effect */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    100% { left: 100%; }
+  }
+
+  /* Blob Animation */
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  @keyframes blob {
+    0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+    50% { border-radius: 50% 60% 30% 60% / 30% 60% 70% 40%; }
+    75% { border-radius: 60% 40% 60% 30% / 70% 30% 50% 60%; }
+  }
+
+  /* Bounce Slow */
+  .animate-bounce-slow {
+    animation: bounce-slow 3s ease-in-out infinite;
+  }
+
+  @keyframes bounce-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  /* Spin Slow */
+  .animate-spin-slow {
+    animation: spin 8s linear infinite;
+  }
+
+  /* Wiggle */
+  .animate-wiggle {
+    animation: wiggle 1s ease-in-out infinite;
+  }
+
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+
+  /* Gen-Z Card Hover Effect */
+  .card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-soft);
+  }
+
+  /* Neon Border */
+  .border-neon {
+    border: 2px solid transparent;
+    background: linear-gradient(var(--background), var(--background)) padding-box,
+                var(--gradient-neon) border-box;
+  }
+
+  /* Gold Badge and Achievement Utilities */
   .gold-icon {
     color: hsl(var(--gold-primary));
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
@@ -158,43 +361,27 @@
   }
   
   @keyframes achievement-glow {
-    from {
-      filter: drop-shadow(0 0 5px hsl(var(--gold-primary) / 0.5));
-    }
-    to {
-      filter: drop-shadow(0 0 15px hsl(var(--gold-primary) / 0.8));
-    }
+    from { filter: drop-shadow(0 0 5px hsl(var(--gold-primary) / 0.5)); }
+    to { filter: drop-shadow(0 0 15px hsl(var(--gold-primary) / 0.8)); }
   }
 
-  /* Gradient animation */
-  .animate-gradient {
-    background-size: 200% auto;
-    animation: gradient-shift 3s linear infinite;
-  }
-  
-  @keyframes gradient-shift {
-    0% {
-      background-position: 0% center;
-    }
-    50% {
-      background-position: 100% center;
-    }
-    100% {
-      background-position: 0% center;
-    }
+  /* Interactive Hover Scale */
+  .hover-lift {
+    @apply transition-all duration-300;
   }
 
-  /* Slow bounce animation */
-  .animate-bounce-slow {
-    animation: bounce-slow 3s ease-in-out infinite;
+  .hover-lift:hover {
+    @apply -translate-y-1;
+    box-shadow: var(--shadow-soft);
   }
-  
-  @keyframes bounce-slow {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
+
+  /* Emoji Pop */
+  .emoji-pop {
+    display: inline-block;
+    transition: transform 0.2s ease;
+  }
+
+  .emoji-pop:hover {
+    transform: scale(1.3) rotate(10deg);
   }
 }
