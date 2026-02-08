@@ -137,10 +137,21 @@ export const handleGoogleSuccess = async (credentialResponse: any) => {
           
           return { 
             data: { 
-              user: signUpData.user,
+              user: {
+                ...signUpData.user,
+                // Preserve Google data for profile completion
+                name: decoded.name,
+                email: decoded.email,
+                picture: decoded.picture,
+              },
               requiresProfileCompletion: true,
               missingFields: requiredFields,
-              isNewUser: true
+              isNewUser: true,
+              googleUserData: {
+                fullName: decoded.name,
+                email: decoded.email,
+                avatarUrl: decoded.picture
+              }
             }, 
             error: null,
             message: 'Account created! Please complete your profile to get started.'
@@ -175,7 +186,12 @@ export const handleGoogleSuccess = async (credentialResponse: any) => {
             ...data,
             requiresProfileCompletion: true,
             missingFields: missingFields,
-            isExistingUser: !!userProfile
+            isExistingUser: !!userProfile,
+            googleUserData: {
+              fullName: decoded.name,
+              email: decoded.email,
+              avatarUrl: decoded.picture
+            }
           }, 
           error: null,
           message: userProfile ? 'Welcome back! Please complete your profile.' : 'Welcome! Please complete your profile to get started.'

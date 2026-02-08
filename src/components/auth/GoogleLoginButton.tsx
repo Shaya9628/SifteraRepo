@@ -57,31 +57,60 @@ export const GoogleLoginButton = ({
       toast.success(result.message || message);
       
       // Redirect to profile completion page with user data
-      const userData = result.data.isExistingUser 
-        ? {
-            fullName: result.data.user?.full_name,
-            email: result.data.user?.email,
-            avatarUrl: result.data.user?.avatar_url
-          }
-        : {
-            fullName: result.data.user?.user_metadata?.full_name,
-            email: result.data.user?.email,
-            avatarUrl: result.data.user?.user_metadata?.avatar_url
-          };
+// Use Google data from the auth response if available
+        const userData = result.data.googleUserData || {
+          fullName: result.data.isExistingUser 
+            ? (result.data.user?.full_name || result.data.user?.name)
+            : (result.data.user?.user_metadata?.full_name || result.data.user?.name),
+          email: result.data.user?.email,
+          avatarUrl: result.data.isExistingUser
+            ? (result.data.user?.avatar_url || result.data.user?.picture)
+            : (result.data.user?.user_metadata?.avatar_url || result.data.user?.picture)
+        };
 
       if (onSuccess) {
         onSuccess();
       } else {
-        // Use the existing ProfileSelection page instead of ProfileCompletion
-        navigate('/profile-selection', { 
-          state: { 
-            fromGoogleAuth: true,
-            missingFields: result.data.missingFields,
-            isNewUser: result.data.isNewUser,
-            isExistingUser: result.data.isExistingUser,
-            googleUserData: userData
-          } 
-        });
+        // Check if we need profile completion vs domain selection
+        const needsBasicInfo = result.data.missingFields?.includes('full_name') || 
+                              result.data.missingFields?.includes('email') ||
+                              result.data.missingFields?.includes('phone');
+        
+        const userData = result.data.isExistingUser 
+          ? {
+              fullName: result.data.user?.full_name,
+              email: result.data.user?.email,
+              avatarUrl: result.data.user?.avatar_url
+            }
+          : {
+              fullName: result.data.user?.user_metadata?.full_name,
+              email: result.data.user?.email,
+              avatarUrl: result.data.user?.user_metadata?.avatar_url
+            };
+
+        if (needsBasicInfo) {
+          // Go to profile completion for basic info
+          navigate('/profile-completion', { 
+            state: { 
+              fromGoogleAuth: true,
+              missingFields: result.data.missingFields,
+              isNewUser: result.data.isNewUser,
+              isExistingUser: result.data.isExistingUser,
+              googleUserData: userData
+            } 
+          });
+        } else {
+          // Go to profile selection for domain selection
+          navigate('/profile-selection', { 
+            state: { 
+              fromGoogleAuth: true,
+              missingFields: result.data.missingFields,
+              isNewUser: result.data.isNewUser,
+              isExistingUser: result.data.isExistingUser,
+              googleUserData: userData
+            } 
+          });
+        }
       }
       return;
     }
