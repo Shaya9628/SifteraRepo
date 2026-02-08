@@ -6,19 +6,19 @@ const HowItWorks = () => {
       icon: Upload,
       number: '01',
       title: 'Upload Resumes',
-      description: 'Add practice resumes or use our curated library of real-world examples across different roles and industries.',
+      description: 'Upload practice resumes or use our curated examples from different roles and industries.',
     },
     {
       icon: Target,
       number: '02',
       title: 'Score & Compare',
-      description: 'First, score resumes with your own assessment. Then see AI analysis side-by-side. Learn from differences and improve your accuracy.',
+      description: 'Score with your assessment, then compare with AI analysis to learn and improve accuracy.',
     },
     {
       icon: TrendingUp,
       number: '03',
-      title: 'Learn & Improve',
-      description: 'Track your scoring accuracy against AI, understand reasoning differences, earn badges, and continuously improve your screening skills.',
+      title: 'Track Progress',
+      description: 'Monitor accuracy improvements, understand differences, and earn badges for skill development.',
     },
   ];
 
@@ -27,13 +27,12 @@ const HowItWorks = () => {
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Get Your Team Screening Like Experts in{' '}
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              3 Simple Steps
+              How It Works
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground">
-            Our structured approach ensures consistent, high-quality resume screening across your entire team.
+          <p className="text-lg text-muted-foreground">
+            Three simple steps to expert-level resume screening.
           </p>
         </div>
 

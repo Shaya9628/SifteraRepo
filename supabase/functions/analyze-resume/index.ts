@@ -166,14 +166,17 @@ serve(async (req) => {
     // Handle both old and new format for backwards compatibility
     const requestBody = await req.json();
     
-    // New comprehensive format
-    let resumeText, candidateName, department, userScores;
+    // New comprehensive format OR free screen format
+    let resumeText, candidateName, department, userScores, jobDescription, isFreeScreen, isBasicFitment;
     
     if (requestBody.resume_text) {
-      // New format from triggerComprehensiveAIAnalysis
+      // New format from triggerComprehensiveAIAnalysis OR free screen
       resumeText = requestBody.resume_text;
-      candidateName = 'Candidate'; // Fallback as new format doesn't include name
+      candidateName = 'Candidate';
       department = requestBody.department;
+      jobDescription = requestBody.job_description; // For free screen
+      isFreeScreen = requestBody.free_screen_mode || false;
+      isBasicFitment = requestBody.basic_fitment_only || false;
       
       // Convert comprehensive assessment data to userScores format for comparison
       if (requestBody.user_scorecard && requestBody.assessment_complete) {
@@ -194,6 +197,8 @@ serve(async (req) => {
       candidateName = requestBody.candidateName;
       department = requestBody.department;
       userScores = requestBody.userScores;
+      isFreeScreen = false;
+      isBasicFitment = false;
     }
     
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
@@ -237,7 +242,23 @@ User's Assessment:
 ${trainingConfig ? `\nEvaluate based on the company-specific criteria provided. Consider the weightage model when calculating scores.` : ''}
 
 Provide AI scores and detailed comparative feedback for each category. Identify where the user assessed accurately vs where they over/underestimated. Be specific and educational.`
-      : `Analyze this resume for ${candidateName} applying for ${department} position:
+      : isFreeScreen && jobDescription
+        ? `Analyze this resume against the job description for quick fitment screening:
+
+Resume: ${resumeText}
+
+Job Description: ${jobDescription}
+
+Provide a focused analysis for HR professionals doing initial screening:
+1. Calculate overall fitment percentage (0-100) using industry standards: Skills Match (30%), Experience Level (25%), Education Requirements (20%), Cultural Fit Indicators (15%), Career Progression (10%)
+2. Identify matched skills/qualifications from the job description
+3. Identify missing skills/qualifications that are critical for the role
+4. Provide clear recommendation (RECOMMENDED/CONSIDER/NOT_RECOMMENDED)
+5. Brief reasoning for the recommendation focusing on job-specific fit
+6. Flag any obvious red flags for HR consideration
+
+Focus on practical hiring decisions rather than detailed category breakdowns. Be concise and actionable for busy HR professionals.`
+        : `Analyze this resume for ${candidateName} applying for ${department} position:
 
 ${resumeText}
 
@@ -342,6 +363,42 @@ ${trainingConfig ? `\nEvaluate based on the company-specific criteria provided. 
                 required: ['ai_scores', 'ai_total_score', 'user_total_score', 'comparative_feedback', 'overall_feedback', 'red_flags', 'interview_questions', 'recommendation', 'reasoning'],
                 additionalProperties: false
               }
+            } : isFreeScreen ? {
+              name: 'free_screen_analysis',
+              description: 'Return simplified resume analysis focused on job fitment screening',
+              parameters: {
+                type: 'object',
+                properties: {
+                  fitment_score: { type: 'number', minimum: 0, maximum: 100 },
+                  recommendation: { 
+                    type: 'string', 
+                    enum: ['RECOMMENDED', 'CONSIDER', 'NOT_RECOMMENDED'] 
+                  },
+                  status: { type: 'string' },
+                  matched_skills: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Skills/qualifications that match the job requirements'
+                  },
+                  missing_skills: {
+                    type: 'array', 
+                    items: { type: 'string' },
+                    description: 'Important skills/qualifications missing from resume'
+                  },
+                  red_flags: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Any obvious concerns or red flags'
+                  },
+                  reasoning: { type: 'string' },
+                  brief_summary: { 
+                    type: 'string',
+                    description: 'One sentence summary for quick decision making'
+                  }
+                },
+                required: ['fitment_score', 'recommendation', 'status', 'matched_skills', 'missing_skills', 'reasoning', 'brief_summary'],
+                additionalProperties: false
+              }
             } : {
               name: 'analyze_resume',
               description: 'Return structured resume analysis with scores and recommendations based on company-specific criteria',
@@ -406,7 +463,13 @@ ${trainingConfig ? `\nEvaluate based on the company-specific criteria provided. 
             }
           }
         ],
-        tool_choice: { type: 'function', function: { name: userScores ? 'compare_assessment' : 'analyze_resume' } }
+        tool_choice: { 
+          type: 'function', 
+          function: { 
+            name: userScores ? 'compare_assessment' : 
+                  isFreeScreen ? 'free_screen_analysis' : 'analyze_resume' 
+          } 
+        }
       })
     });
 

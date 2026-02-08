@@ -28,13 +28,13 @@ const CTA = () => {
             </div>
 
             <h2 className="text-3xl md:text-5xl font-bold mb-6 text-primary-foreground">
-              Ready to Transform Your{' '}
-              <span className="underline decoration-4 decoration-white/50">Hiring Process?</span>
+              Ready to{' '}
+              <span className="underline decoration-4 decoration-white/50">Screen Smarter?</span>
             </h2>
 
-            <p className="text-xl text-primary-foreground/80 mb-10 max-w-2xl mx-auto">
-              Join HR professionals who are making smarter hiring decisions with AI-powered resume screening. 
-              Start with two free uploads today.
+            <p className="text-lg text-primary-foreground/80 mb-10 max-w-2xl mx-auto">
+              Join HR professionals making better hiring decisions with AI. 
+              Start with two free uploads—no signup required.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

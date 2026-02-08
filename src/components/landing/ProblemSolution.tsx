@@ -2,17 +2,17 @@ import { X, Check } from 'lucide-react';
 
 const ProblemSolution = () => {
   const problems = [
-    'Inconsistent screening criteria across your team',
-    'New hires take months to train effectively',
-    'No way to track screening accuracy or improvement',
-    'Subjective decisions leading to missed talent',
+    'Inconsistent screening across teams',
+    'Long training times for new hires',
+    'No accuracy tracking or improvement',
+    'Subjective decisions miss talent',
   ];
 
   const solutions = [
-    'Start free with two resume uploads—no commitment required',
-    'AI + Human dual scoring for improved accuracy',
-    'Side-by-side comparison with AI-powered insights',
-    'Real-time analytics to track screening performance',
+    'Free trial with two resumes—no commitment',
+    'AI + Human dual scoring for accuracy',
+    'Side-by-side comparison with insights',
+    'Real-time analytics and performance tracking',
   ];
 
   return (
@@ -20,11 +20,12 @@ const ProblemSolution = () => {
       <div className="container mx-auto px-4">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Stop Wasting Hours on{' '}
-            <span className="text-destructive">Inconsistent</span> Resume Screening
+            From{' '}
+            <span className="text-destructive">Inconsistent</span> to{' '}
+            <span className="text-primary">Precise</span>
           </h2>
-          <p className="text-xl text-muted-foreground">
-            Transform your hiring process from guesswork to precision with structured training.
+          <p className="text-lg text-muted-foreground">
+            Transform your hiring process with structured AI-powered screening.
           </p>
         </div>
 

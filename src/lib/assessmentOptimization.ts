@@ -232,3 +232,104 @@ export const optimizedLoadAssessment = async (
     canAnalyze
   };
 };
+
+// Usage tracking interfaces for free screening
+export interface FreeScreenUsage {
+  ip_address: string;
+  session_id?: string;
+  usage_count: number;
+  last_used: string;
+}
+
+// Check daily usage limits for free screening
+export const checkFreeScreenUsage = async (ipAddress: string, sessionId?: string): Promise<{ canUse: boolean; usageCount: number; resetTime?: Date }> => {
+  try {
+    // For development, allow 2 uses per session
+    const storageKey = `free_screen_usage_${ipAddress}`;
+    const stored = localStorage.getItem(storageKey);
+    const usageData = stored ? JSON.parse(stored) : { count: 0, date: new Date().toDateString() };
+    
+    // Reset count if it's a new day
+    const today = new Date().toDateString();
+    if (usageData.date !== today) {
+      usageData.count = 0;
+      usageData.date = today;
+      localStorage.setItem(storageKey, JSON.stringify(usageData));
+    }
+    
+    const canUse = usageData.count < 2;
+    
+    // Calculate reset time (tomorrow at midnight)
+    const resetTime = new Date();
+    resetTime.setDate(resetTime.getDate() + 1);
+    resetTime.setHours(0, 0, 0, 0);
+
+    return { canUse, usageCount: usageData.count, resetTime };
+  } catch (error) {
+    console.error('Error in checkFreeScreenUsage:', error);
+    return { canUse: true, usageCount: 0 };
+  }
+};
+
+// Track free screening usage
+export const trackFreeScreenUsage = async (ipAddress: string, sessionId?: string): Promise<void> => {
+  try {
+    // For development, use localStorage
+    const storageKey = `free_screen_usage_${ipAddress}`;
+    const stored = localStorage.getItem(storageKey);
+    const usageData = stored ? JSON.parse(stored) : { count: 0, date: new Date().toDateString() };
+    
+    // Reset count if it's a new day
+    const today = new Date().toDateString();
+    if (usageData.date !== today) {
+      usageData.count = 0;
+      usageData.date = today;
+    }
+    
+    usageData.count += 1;
+    localStorage.setItem(storageKey, JSON.stringify(usageData));
+    
+    console.log('Usage tracked:', usageData);
+  } catch (error) {
+    console.error('Error tracking free screen usage:', error);
+  }
+};
+
+// Simplified AI analysis for free screening (no assessments required)
+export const triggerFreeScreenAIAnalysis = async (
+  resumeText: string,
+  jobDescription: string,
+  department: string = 'General'
+): Promise<any> => {
+  try {
+    console.log('Triggering free screen AI analysis with:', {
+      resumeLength: resumeText.length,
+      jobDescLength: jobDescription.length,
+      department
+    });
+
+    const analysisPayload = {
+      resume_text: resumeText,
+      job_description: jobDescription,
+      department: department,
+      assessment_complete: false,
+      free_screen_mode: true,
+      basic_fitment_only: true
+    };
+
+    const { data, error } = await supabase.functions.invoke('analyze-resume', {
+      body: analysisPayload
+    });
+
+    if (error) {
+      console.error('Free Screen AI Analysis error:', error);
+      throw error;
+    }
+
+    console.log('Free Screen AI Analysis completed:', data);
+    return data;
+  } catch (error) {
+    console.error('Error in free screen AI analysis:', error);
+    throw error;
+  }
+};

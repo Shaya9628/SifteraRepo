@@ -7,7 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { DomainSelector } from '@/components/DomainSelector';
 import { GLOBAL_DOMAINS, type Domain } from '@/lib/constants/domains';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
+
 const ProfileSelection = () => {
   const { user } = useAuth();
   const navigate = useNavigate();

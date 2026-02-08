@@ -18,6 +18,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AIResults from "./pages/AIResults";
+import FreeScreen from "./pages/FreeScreen";
 import { ProfileCompletion } from "./pages/ProfileCompletion";
 
 const queryClient = new QueryClient({
@@ -53,6 +54,7 @@ const App = () => {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-of-service" element={<PrivacyPolicy />} />
+                <Route path="/free-screen" element={<FreeScreen />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

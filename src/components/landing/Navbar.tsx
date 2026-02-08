@@ -17,11 +17,21 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
+    { label: 'Free Screening', href: '/free-screen', isRoute: true },
     { label: 'Features', href: '#features' },
     { label: 'How It Works', href: '#how-it-works' },
     { label: 'Pricing', href: '#pricing' },
     { label: 'FAQ', href: '#faq' },
   ];
+
+  const handleNavigation = (link: typeof navLinks[0]) => {
+    if (link.isRoute) {
+      navigate(link.href);
+    } else {
+      scrollToSection(link.href);
+    }
+    setIsMobileMenuOpen(false);
+  };
 
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
@@ -56,8 +66,12 @@ const Navbar = () => {
             {navLinks.map((link) => (
               <button
                 key={link.label}
-                onClick={() => scrollToSection(link.href)}
-                className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+                onClick={() => handleNavigation(link)}
+                className={`transition-colors font-medium ${
+                  link.label === 'Free Screening' 
+                    ? 'text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold' 
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
               >
                 {link.label}
               </button>
@@ -94,8 +108,12 @@ const Navbar = () => {
               {navLinks.map((link) => (
                 <button
                   key={link.label}
-                  onClick={() => scrollToSection(link.href)}
-                  className="text-left px-4 py-2 text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => handleNavigation(link)}
+                  className={`text-left px-4 py-2 transition-colors ${
+                    link.label === 'Free Screening'
+                      ? 'text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
                 >
                   {link.label}
                 </button>

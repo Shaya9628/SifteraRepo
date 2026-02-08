@@ -43,19 +43,42 @@ const Hero = () => {
                 {/* Main Headline */}
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
                 <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
-                  Sifteraa
+                  Master Resume Screening
+                </span>
+                <br />
+                <span className="bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500 bg-clip-text text-transparent">
+                  Compare & Learn
                 </span>
               </h1>
 
               {/* Tagline */}
-              <div className="text-2xl md:text-3xl font-semibold text-foreground/80 mb-6">
-                Train Smart. Screen Better. Build Confidence.
+              <div className="text-xl md:text-2xl font-medium text-muted-foreground mb-8 max-w-lg mx-auto lg:mx-0">
+                Screen resumes, compare with expert analysis, and
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold"> boost your efficiency</span>. 
+                Learn while you work.
               </div>
 
-              {/* Subtitle */}
-              <p className="text-lg text-muted-foreground mb-8 max-w-lg mx-auto lg:mx-0">
-                From "Am I doing this right?" to "I've absolutely got this!" Transform your resume screening skills with interactive training designed for HR professionals who want to excel.
-              </p>
+              {/* Key Value Props with Icons */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 mb-8">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                    <TrendingUp className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  Learn & Improve
+                </div>
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <CheckCircle className="w-4 h-4 text-blue-600" />
+                  </div>
+                  Compare Analysis
+                </div>
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                    <Users className="w-4 h-4 text-purple-600" />
+                  </div>
+                  500+ HR Trained
+                </div>
+              </div>
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
@@ -82,15 +105,19 @@ const Hero = () => {
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2 font-semibold text-emerald-600 dark:text-emerald-400">
                   <CheckCircle className="w-4 h-4 text-emerald-500" />
-                  2 Free Resume Uploads
+                  Learn While You Work
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-emerald-500" />
-                  No Credit Card Required
+                  Expert Comparisons
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-emerald-500" />
-                  Instant AI Analysis
+                  Boost Efficiency
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  500+ HR Trained
                 </div>
               </div>
             </div>

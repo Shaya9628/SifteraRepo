@@ -1,5 +1,6 @@
 import Navbar from '@/components/landing/Navbar';
 import Hero from '@/components/landing/Hero';
+import FreeTools from '@/components/landing/FreeTools';
 import TrustedBy from '@/components/landing/TrustedBy';
 import FreeHighlight from '@/components/landing/FreeHighlight';
 import ProblemSolution from '@/components/landing/ProblemSolution';
@@ -18,6 +19,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <Hero />
+      <FreeTools />
       <TrustedBy />
       <FreeHighlight />
       <ProblemSolution />

@@ -157,23 +157,33 @@ const Auth = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
+    <div className="flex min-h-screen items-center justify-center relative overflow-hidden">
+      {/* Gen Z Animated Background */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10" />
+        <div className="absolute top-20 left-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}} />
+        <div className="absolute top-1/2 left-1/4 w-80 h-80 bg-neon-purple/20 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-1/4 right-1/3 w-72 h-72 bg-neon-cyan/20 rounded-full blur-3xl animate-blob" />
+      </div>
+      
       {/* Back to Home Button */}
       <Link 
         to="/" 
-        className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+        className="absolute top-6 left-6 flex items-center gap-2 glass px-4 py-2 rounded-full hover:glow-purple transition-all duration-300 z-20"
       >
         <ArrowLeft className="h-4 w-4" />
         <span className="text-sm font-medium">Back to Home</span>
       </Link>
       
-      <Card className="w-full max-w-md shadow-2xl">
+      <Card className="w-full max-w-md glass-strong glow-cyan border-neon relative z-10">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Siftera
+          <CardTitle className="text-4xl font-bold text-gradient-neon animate-gradient">
+            Siftera ✨
           </CardTitle>
-          <CardDescription>
-            Where HR confidence is built through hands-on practice
+          <CardDescription className="text-lg font-medium">
+            Where HR confidence is built through{' '}
+            <span className="text-gradient font-bold">hands-on practice</span> 🚀
           </CardDescription>
         </CardHeader>
         <CardContent>

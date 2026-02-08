@@ -8,39 +8,39 @@ const Features = () => {
   const features = [
     {
       icon: Brain,
-      title: 'User + AI Dual Scoring',
-      description: 'Score resumes with your own expertise, then compare with our AI analysis. Learn from discrepancies and improve your screening accuracy over time.',
-      highlights: ['Your score vs AI score', 'Comparative analysis', 'Learning insights', 'Skill improvement tracking'],
+      title: 'AI + Human Scoring',
+      description: 'Compare your assessment with AI analysis. Learn from differences and improve accuracy.',
+      highlights: ['Your vs AI score', 'Learning insights', 'Accuracy tracking', 'Skill improvement'],
       image: featureAiScoring,
     },
     {
       icon: Trophy,
-      title: 'Gamification & Achievements',
-      description: 'Earn badges, accumulate points, and compete on leaderboards. Learning becomes engaging when there\'s recognition involved.',
-      highlights: ['Achievement badges', 'Points system', 'Weekly challenges', 'Team competitions'],
+      title: 'Gamified Learning',
+      description: 'Earn badges and points while mastering resume screening skills.',
+      highlights: ['Achievement badges', 'Points system', 'Team challenges', 'Leaderboards'],
       image: featureGamification,
     },
     {
       icon: Users,
       title: 'Team Collaboration',
-      description: 'Create workspaces for your HR team, compare scoring patterns, and ensure everyone follows the same screening standards.',
-      highlights: ['Shared workspaces', 'Calibration sessions', 'Peer learning', 'Manager dashboards'],
+      description: 'Align your team with shared workspaces and consistent standards.',
+      highlights: ['Shared workspaces', 'Team calibration', 'Peer learning', 'Manager insights'],
       image: featureTeamCollaboration,
     },
     {
       icon: Zap,
-      title: 'Dual Scoring Insights',
-      description: 'See both your assessment and AI analysis side-by-side. Understand scoring differences, learn from AI expertise, and build confidence in your decisions.',
-      highlights: ['Side-by-side comparison', 'Score reasoning', 'Learning recommendations', 'Decision confidence'],
+      title: 'Smart Insights',
+      description: 'Side-by-side analysis helps you understand scoring patterns and build confidence.',
+      highlights: ['Score comparison', 'Detailed reasoning', 'Learning tips', 'Decision support'],
       image: featureDualScoring,
     },
   ];
 
   const additionalFeatures = [
-    { icon: BarChart3, title: 'Advanced Analytics', description: 'Deep insights into team performance and trends', color: 'from-blue-500 to-cyan-500' },
-    { icon: Shield, title: 'Enterprise Security', description: 'SOC 2 compliant with encrypted data storage', color: 'from-emerald-500 to-teal-500' },
-    { icon: Star, title: 'Custom Rubrics', description: 'Create scoring criteria specific to your roles', color: 'from-amber-500 to-orange-500' },
-    { icon: Rocket, title: 'API Access', description: 'Integrate with your existing HR systems', color: 'from-purple-500 to-pink-500' },
+    { icon: BarChart3, title: 'Analytics', description: 'Performance insights and trends', color: 'from-blue-500 to-cyan-500' },
+    { icon: Shield, title: 'Secure', description: 'SOC 2 compliant data protection', color: 'from-emerald-500 to-teal-500' },
+    { icon: Star, title: 'Custom Rubrics', description: 'Role-specific scoring criteria', color: 'from-amber-500 to-orange-500' },
+    { icon: Rocket, title: 'API Ready', description: 'Integrate with your HR systems', color: 'from-purple-500 to-pink-500' },
   ];
 
   return (
@@ -52,16 +52,15 @@ const Features = () => {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 text-primary text-sm font-medium mb-6 border border-primary/30">
             <Zap className="w-4 h-4" />
-            Powerful Features
+            Features
           </div>
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            How Siftera Builds Your{' '}
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              HR Confidence
+              Smart HR Tools
             </span>
           </h2>
-          <p className="text-xl text-muted-foreground">
-            Intelligent HR and skill management features designed to transform your recruitment process.
+          <p className="text-lg text-muted-foreground">
+            AI-powered screening that learns from your expertise.
           </p>
         </div>
 
