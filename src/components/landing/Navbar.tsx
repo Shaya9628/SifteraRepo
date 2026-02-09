@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Sparkles } from 'lucide-react';
+import { Menu, X, Sparkles, ChevronDown, UserPlus, FileSearch } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -17,21 +23,11 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { label: 'Free Screening', href: '/free-screen', isRoute: true },
     { label: 'Features', href: '#features' },
     { label: 'How It Works', href: '#how-it-works' },
     { label: 'Pricing', href: '#pricing' },
     { label: 'FAQ', href: '#faq' },
   ];
-
-  const handleNavigation = (link: typeof navLinks[0]) => {
-    if (link.isRoute) {
-      navigate(link.href);
-    } else {
-      scrollToSection(link.href);
-    }
-    setIsMobileMenuOpen(false);
-  };
 
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
@@ -66,12 +62,8 @@ const Navbar = () => {
             {navLinks.map((link) => (
               <button
                 key={link.label}
-                onClick={() => handleNavigation(link)}
-                className={`transition-colors font-medium ${
-                  link.label === 'Free Screening' 
-                    ? 'text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold' 
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
+                onClick={() => scrollToSection(link.href)}
+                className="transition-colors font-medium text-muted-foreground hover:text-foreground"
               >
                 {link.label}
               </button>
@@ -83,9 +75,36 @@ const Navbar = () => {
             <Button variant="ghost" onClick={() => navigate('/auth')}>
               Sign In
             </Button>
-            <Button onClick={() => navigate('/auth')} className="shadow-lg shadow-primary/25">
-              Get Started Free
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className="shadow-lg shadow-primary/25 gap-1.5">
+                  Get Started Free
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-72 p-2 bg-popover border border-border shadow-xl">
+                <DropdownMenuItem
+                  onClick={() => navigate('/auth')}
+                  className="flex items-start gap-3 p-3 cursor-pointer rounded-lg focus:bg-accent"
+                >
+                  <UserPlus className="w-5 h-5 mt-0.5 text-primary shrink-0" />
+                  <div>
+                    <div className="font-semibold text-foreground">Create Account</div>
+                    <div className="text-xs text-muted-foreground">Sign up to access all features</div>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => navigate('/free-screen')}
+                  className="flex items-start gap-3 p-3 cursor-pointer rounded-lg focus:bg-accent"
+                >
+                  <FileSearch className="w-5 h-5 mt-0.5 text-emerald-500 shrink-0" />
+                  <div>
+                    <div className="font-semibold text-foreground">Instant Resume Screen</div>
+                    <div className="text-xs text-muted-foreground">Have a resume &amp; JD? Check fitment instantly</div>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Mobile Menu Button */}
@@ -108,12 +127,8 @@ const Navbar = () => {
               {navLinks.map((link) => (
                 <button
                   key={link.label}
-                  onClick={() => handleNavigation(link)}
-                  className={`text-left px-4 py-2 transition-colors ${
-                    link.label === 'Free Screening'
-                      ? 'text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
+                  onClick={() => scrollToSection(link.href)}
+                  className="text-left px-4 py-2 transition-colors text-muted-foreground hover:text-foreground"
                 >
                   {link.label}
                 </button>
@@ -123,7 +138,15 @@ const Navbar = () => {
                   Sign In
                 </Button>
                 <Button onClick={() => navigate('/auth')}>
-                  Get Started Free
+                  Create Account
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => { navigate('/free-screen'); setIsMobileMenuOpen(false); }}
+                  className="border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10"
+                >
+                  <FileSearch className="w-4 h-4 mr-2" />
+                  Instant Resume Screen
                 </Button>
               </div>
             </div>

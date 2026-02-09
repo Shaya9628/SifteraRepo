@@ -120,6 +120,23 @@ const Hero = () => {
                   500+ HR Trained
                 </div>
               </div>
+
+              {/* Inline Free Screen CTA */}
+              <div
+                onClick={() => navigate('/free-screen')}
+                className="mt-8 cursor-pointer group p-4 rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-primary/20 flex items-center justify-center shrink-0">
+                    <FileText className="w-5 h-5 text-emerald-500" />
+                  </div>
+                  <div className="flex-1">
+                    <span className="text-sm font-semibold text-foreground">Have a candidate resume &amp; JD?</span>
+                    <span className="text-sm text-muted-foreground ml-1">Check fitment instantly —</span>
+                    <span className="text-sm font-semibold text-primary group-hover:underline ml-1">no sign-up needed →</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Right - Hero Image */}
