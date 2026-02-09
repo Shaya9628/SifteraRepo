@@ -1,98 +1,45 @@
 
-# Fix Google Sign-In: Replace Blocked iframe with Redirect Flow
+# Remove "Free Screening" from Navbar and Add Contextual CTA
 
-## Problem
+## What Changes
 
-When clicking "Sign in with Google", you see:
-```
-accounts.google.com is blocked
-accounts.google.com refused to connect.
-ERR_BLOCKED_BY_RESPONSE
-```
+### 1. Remove "Free Screening" Nav Link
+Remove the dedicated "Free Screening" navigation link from the top navbar (both desktop and mobile). This declutters the navigation and keeps it focused on standard SaaS sections (Features, How It Works, Pricing, FAQ).
 
-This happens because the current implementation uses an iframe-based approach that Google blocks for security reasons.
+### 2. Upgrade "Get Started Free" Button with a Dropdown or Dual-Action
+Replace the simple "Get Started Free" button in the navbar with a smart dropdown that gives users two clear paths:
+- **Sign Up / Log In** -- goes to `/auth` (existing behavior)
+- **Instant Resume Check** -- goes to `/free-screen` with a tagline like "Have a resume and JD? Check fitment instantly"
 
-## Solution
+### 3. Add an Inline CTA Banner in the Hero Section
+Below the existing Hero CTA buttons, add a subtle but eye-catching inline prompt:
+> "Already have a candidate resume and JD? [Check fitment instantly -- no sign-up needed]"
 
-Replace the iframe-based Google button with a redirect-based sign-in that opens Google in the same tab, authenticates, and returns to your app.
+This replaces the navbar link with a more contextual, conversion-friendly placement right where users are making decisions.
 
-## What Will Change
+### 4. Update FreeTools Section Card
+In the FreeTools section, keep the "AI Resume Screening" card but ensure it still links to `/free-screen` so users scrolling the landing page can still discover the free tool.
 
-### 1. Google Sign-In Button (Complete Rewrite)
-Replace the embedded Google widget with a custom button that uses the redirect flow:
-
-| Before | After |
-|--------|-------|
-| Embedded Google iframe widget | Custom styled button matching your design |
-| Blocked by cross-origin policy | Works in all browsers |
-| Complex token handling | Automatic session management |
-
-### 2. Main App Entry (Simplify)
-Remove the `GoogleOAuthProvider` wrapper that's no longer needed:
-
-| Before | After |
-|--------|-------|
-| App wrapped in `GoogleOAuthProvider` | Direct rendering without extra wrapper |
-
-### 3. Auth Page (Add Redirect Handler)
-Add logic to handle users returning from Google sign-in:
-
-- Detect when user lands on `/auth` after Google redirect
-- Check if session exists and profile is complete
-- Route to dashboard or profile completion as needed
-
-### 4. Cleanup Old Code
-Remove the complex JWT decoding logic that's no longer needed since Lovable Cloud handles this automatically.
-
-## User Experience After Fix
-
-```text
-1. User clicks "Continue with Google" button
-2. Browser navigates to Google's login page (full page, not popup)
-3. User selects their Google account
-4. Google redirects back to your app
-5. App detects session and routes appropriately:
-   → New user: Profile completion page
-   → Existing user with complete profile: Dashboard
-   → Existing user missing details: Profile completion
-```
-
-## Files to Modify
-
-| File | Change |
-|------|--------|
-| `src/components/auth/GoogleLoginButton.tsx` | Replace with redirect-based implementation |
-| `src/main.tsx` | Remove `GoogleOAuthProvider` wrapper |
-| `src/pages/Auth.tsx` | Add OAuth redirect callback handling |
-| `src/lib/auth/googleAuth.ts` | Simplify to only handle post-auth profile logic |
+---
 
 ## Technical Details
 
-### New GoogleLoginButton Implementation
-```typescript
-import { lovable } from "@/integrations/lovable";
+### Files to Modify
 
-const handleGoogleSignIn = async () => {
-  const { error } = await lovable.auth.signInWithOAuth("google", {
-    redirect_uri: window.location.origin,
-  });
-  
-  if (error) {
-    toast.error("Failed to connect to Google");
-  }
-  // Browser redirects to Google automatically
-};
-```
+**`src/components/landing/Navbar.tsx`**
+- Remove the `{ label: 'Free Screening', href: '/free-screen', isRoute: true }` entry from `navLinks` array
+- Remove the special emerald styling conditional for "Free Screening" in both desktop and mobile nav
+- Replace the "Get Started Free" button with a dropdown menu containing two options:
+  - "Create Account" linking to `/auth`
+  - "Instant Resume Screen" linking to `/free-screen` with a short description
+- Import `DropdownMenu` components from radix-ui
 
-### Post-Redirect Handling in Auth.tsx
-When user returns from Google, check session and route:
-- Listen for `onAuthStateChange` events
-- Check profile completion status
-- Navigate to appropriate page
+**`src/components/landing/Hero.tsx`**
+- Add a new inline CTA row below the existing trust indicators (around line 122)
+- Text: "Have a candidate resume and JD? Check fitment instantly -- no sign-up needed"
+- Style: subtle glass card with a gradient accent border, linking to `/free-screen`
+- Uses the Gen-Z theme styling (gradient text, glow effects)
 
-### Dependencies
-After this change, you can optionally remove:
-- `@react-oauth/google` 
-- `jwt-decode`
-
-These were only used for the iframe approach.
+### No Route Changes
+- The `/free-screen` route stays in `App.tsx` -- we're only changing how users discover it
+- The `FreeTools` and `FreeHighlight` landing sections remain unchanged
