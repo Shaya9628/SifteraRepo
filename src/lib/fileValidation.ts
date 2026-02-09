@@ -26,14 +26,59 @@ const JOB_DESCRIPTION_KEYWORDS = [
   'equal opportunity', 'competitive salary'
 ];
 
+// Extract text content from PDF using pdfjs-dist
+const extractTextFromPDF = async (file: File): Promise<string> => {
+  try {
+    const pdfjsLib = await import('pdfjs-dist');
+    
+    // Set worker source to use CDN
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+    
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    
+    const textParts: string[] = [];
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items
+        .map((item: any) => item.str)
+        .join(' ');
+      textParts.push(pageText);
+    }
+    
+    const fullText = textParts.join('\n\n');
+    console.log(`PDF extracted: ${pdf.numPages} pages, ${fullText.length} chars`);
+    
+    if (fullText.trim().length < 20) {
+      console.warn('PDF text extraction yielded very little text - file may be image-based');
+      return `[PDF with minimal extractable text - ${pdf.numPages} pages] ${fullText}`.trim();
+    }
+    
+    return fullText;
+  } catch (error) {
+    console.error('PDF extraction failed:', error);
+    throw new Error('Failed to extract text from PDF. Please try uploading a text-based PDF or a .txt/.docx file.');
+  }
+};
+
 // Extract text content from various file types
-export const extractTextFromFile = (file: File): Promise<string> => {
+export const extractTextFromFile = async (file: File): Promise<string> => {
+  if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+    return extractTextFromPDF(file);
+  }
+  
+  // For text-based files (.txt, .doc, .docx)
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     
     reader.onload = (event) => {
       try {
         const result = event.target?.result as string;
+        if (!result || result.trim().length < 10) {
+          reject(new Error('File appears to be empty or unreadable. Try a different format.'));
+          return;
+        }
         resolve(result);
       } catch (error) {
         reject(new Error('Failed to read file content'));
@@ -41,14 +86,7 @@ export const extractTextFromFile = (file: File): Promise<string> => {
     };
     
     reader.onerror = () => reject(new Error('File reading failed'));
-    
-    // For PDF files, we'll need to handle them differently
-    if (file.type === 'application/pdf') {
-      // For now, we'll just check filename and size as PDF text extraction is complex
-      resolve(`PDF file detected: ${file.name}`);
-    } else {
-      reader.readAsText(file);
-    }
+    reader.readAsText(file);
   });
 };
 
