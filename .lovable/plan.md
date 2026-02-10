@@ -1,45 +1,51 @@
 
-# Remove "Free Screening" from Navbar and Add Contextual CTA
+# AI-Generated Screening Questions for Call Simulation
 
 ## What Changes
 
-### 1. Remove "Free Screening" Nav Link
-Remove the dedicated "Free Screening" navigation link from the top navbar (both desktop and mobile). This declutters the navigation and keeps it focused on standard SaaS sections (Features, How It Works, Pricing, FAQ).
+The Call Simulation stage (Stage 3) will generate tailored interview questions using AI based on the candidate's actual resume and department, instead of pulling generic static questions from the database. The UI will get a Gen-Z visual refresh. **No other flows are touched** -- scorecard, red flags, AI results (Stage 4), scoring, badges, progress tracking all remain exactly as they are.
 
-### 2. Upgrade "Get Started Free" Button with a Dropdown or Dual-Action
-Replace the simple "Get Started Free" button in the navbar with a smart dropdown that gives users two clear paths:
-- **Sign Up / Log In** -- goes to `/auth` (existing behavior)
-- **Instant Resume Check** -- goes to `/free-screen` with a tagline like "Have a resume and JD? Check fitment instantly"
+## How It Works
 
-### 3. Add an Inline CTA Banner in the Hero Section
-Below the existing Hero CTA buttons, add a subtle but eye-catching inline prompt:
-> "Already have a candidate resume and JD? [Check fitment instantly -- no sign-up needed]"
+1. User reaches Stage 3 (Call Simulation) after completing Red Flags
+2. The component sends the resume text + department to a new backend function
+3. AI (Gemini Flash) generates 5-8 role-specific behavioral and cultural fit questions with interviewer tips
+4. Questions appear in a refreshed Gen-Z glassmorphism UI
+5. If AI fails, the system silently falls back to the existing database questions (current behavior)
+6. All submit/scoring/points/badges/progress logic stays identical
 
-This replaces the navbar link with a more contextual, conversion-friendly placement right where users are making decisions.
+## Files Changed
 
-### 4. Update FreeTools Section Card
-In the FreeTools section, keep the "AI Resume Screening" card but ensure it still links to `/free-screen` so users scrolling the landing page can still discover the free tool.
+### 1. New backend function: `supabase/functions/generate-screening-questions/index.ts`
+- Accepts `{ resume_text, department }` in request body
+- Calls Lovable AI gateway (`google/gemini-3-flash-preview`) with tool calling to get structured output
+- Returns array of questions: `{ question_text, category, hint }`
+- Handles 429/402 rate limit errors gracefully
+- Returns empty array on failure so frontend can fall back
 
----
+### 2. `supabase/config.toml` -- add function entry
+- Add `[functions.generate-screening-questions]` with `verify_jwt = true`
+- (This file is auto-managed, so this will be skipped)
 
-## Technical Details
+### 3. `src/components/CallSimulator.tsx` -- AI loading + Gen-Z UI
+- Add `resumeText?: string` to props interface
+- On mount, if `resumeText` is provided, call `supabase.functions.invoke('generate-screening-questions')` to fetch AI questions
+- If AI succeeds, use those questions; if fails, fall back to existing DB fetch (unchanged)
+- Add a "Regenerate" button to re-fetch AI questions
+- Add "AI Generated" sparkle badge next to question counter
+- Gen-Z styling: glassmorphism card wrapper, gradient header, neon score buttons, category toggle pills instead of dropdown
+- **All submit logic, point awards, badge evaluation, progress updates remain 100% untouched**
 
-### Files to Modify
+### 4. `src/pages/Screen.tsx` -- pass resumeText prop
+- Add `resumeText={resumeText}` to the `<CallSimulator>` component (line ~491)
+- Single line change, nothing else modified
 
-**`src/components/landing/Navbar.tsx`**
-- Remove the `{ label: 'Free Screening', href: '/free-screen', isRoute: true }` entry from `navLinks` array
-- Remove the special emerald styling conditional for "Free Screening" in both desktop and mobile nav
-- Replace the "Get Started Free" button with a dropdown menu containing two options:
-  - "Create Account" linking to `/auth`
-  - "Instant Resume Screen" linking to `/free-screen` with a short description
-- Import `DropdownMenu` components from radix-ui
-
-**`src/components/landing/Hero.tsx`**
-- Add a new inline CTA row below the existing trust indicators (around line 122)
-- Text: "Have a candidate resume and JD? Check fitment instantly -- no sign-up needed"
-- Style: subtle glass card with a gradient accent border, linking to `/free-screen`
-- Uses the Gen-Z theme styling (gradient text, glow effects)
-
-### No Route Changes
-- The `/free-screen` route stays in `App.tsx` -- we're only changing how users discover it
-- The `FreeTools` and `FreeHighlight` landing sections remain unchanged
+## What Is NOT Changed
+- Scorecard (Stage 1) -- untouched
+- Red Flags (Stage 2) -- untouched  
+- AI Results / Analysis (Stage 4) -- untouched
+- `analyze-resume` edge function -- untouched
+- Assessment progress tracking -- untouched
+- Points, badges, leaderboard -- untouched
+- Database tables -- no schema changes needed
+- All other pages and components -- untouched
