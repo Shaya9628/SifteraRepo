@@ -56,7 +56,7 @@ export const DomainSwitcher: React.FC<DomainSwitcherProps> = ({
           
           <Select 
             value={currentDomain} 
-            onValueChange={onDomainChange}
+            onValueChange={(val) => onDomainChange(val as Domain)}
             disabled={disabled}
           >
             <SelectTrigger className="w-32">
