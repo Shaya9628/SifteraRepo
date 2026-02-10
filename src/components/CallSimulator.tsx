@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -7,18 +7,24 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Phone, Send, Lightbulb } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Phone, Send, Lightbulb, Sparkles, RefreshCw } from 'lucide-react';
 import { evaluateAndAwardBadges } from '@/lib/badgeEvaluation';
 
 interface CallSimulatorProps {
   resumeId: string;
   candidateName: string;
   department: string;
+  resumeText?: string;
   onComplete?: () => void;
 }
 
-const CallSimulator = ({ resumeId, candidateName, department, onComplete }: CallSimulatorProps) => {
+interface AIQuestion {
+  question_text: string;
+  category: 'behavioral' | 'cultural_fit';
+  hint: string;
+}
+
+const CallSimulator = ({ resumeId, candidateName, department, resumeText, onComplete }: CallSimulatorProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [questionType, setQuestionType] = useState<'behavioral' | 'cultural'>('behavioral');
@@ -29,40 +35,93 @@ const CallSimulator = ({ resumeId, candidateName, department, onComplete }: Call
   const [saving, setSaving] = useState(false);
   const [questions, setQuestions] = useState<any[]>([]);
   const [questionsLoading, setQuestionsLoading] = useState(true);
+  const [isAIGenerated, setIsAIGenerated] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
 
-  // Fetch screening call questions from database
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      const { data, error } = await supabase
-        .from('assessment_questions')
-        .select('*')
-        .eq('stage', 'screening_calls')
-        .eq('is_active', true)
-        .order('sort_order');
+  // Fetch AI-generated questions
+  const fetchAIQuestions = useCallback(async () => {
+    if (!resumeText || resumeText.length < 30) return false;
+    
+    setAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-screening-questions', {
+        body: { resume_text: resumeText, department },
+      });
 
       if (error) {
-        console.error('Error fetching call questions:', error);
-        toast({
-          title: 'Error loading questions',
-          description: 'Using fallback questions',
-          variant: 'destructive',
-        });
-      } else {
-        setQuestions(data || []);
-        // Reset selected question when questions change
-        if (data && data.length > 0) {
-          setSelectedQuestion(0);
+        console.error('AI question generation error:', error);
+        if (error.message?.includes('429')) {
+          toast({ title: 'Rate limited', description: 'AI is busy, using standard questions.', variant: 'destructive' });
         }
+        return false;
+      }
+
+      const aiQuestions: AIQuestion[] = data?.questions || [];
+      if (aiQuestions.length > 0) {
+        setQuestions(aiQuestions.map((q, i) => ({
+          question_text: q.question_text,
+          category: q.category === 'cultural_fit' ? 'cultural_fit' : 'behavioral',
+          hint: q.hint,
+          sort_order: i,
+        })));
+        setIsAIGenerated(true);
+        setSelectedQuestion(0);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      console.error('Failed to fetch AI questions:', err);
+      return false;
+    } finally {
+      setAiLoading(false);
+    }
+  }, [resumeText, department, toast]);
+
+  // Fetch DB fallback questions
+  const fetchDBQuestions = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('assessment_questions')
+      .select('*')
+      .eq('stage', 'screening_calls')
+      .eq('is_active', true)
+      .order('sort_order');
+
+    if (error) {
+      console.error('Error fetching call questions:', error);
+      toast({ title: 'Error loading questions', description: 'Using fallback questions', variant: 'destructive' });
+    } else {
+      setQuestions(data || []);
+      if (data && data.length > 0) setSelectedQuestion(0);
+    }
+  }, [toast]);
+
+  // Load questions: try AI first, fall back to DB
+  useEffect(() => {
+    const loadQuestions = async () => {
+      setQuestionsLoading(true);
+      const aiSuccess = await fetchAIQuestions();
+      if (!aiSuccess) {
+        await fetchDBQuestions();
       }
       setQuestionsLoading(false);
     };
+    loadQuestions();
+  }, [fetchAIQuestions, fetchDBQuestions]);
 
-    fetchQuestions();
-  }, [toast]);
+  const handleRegenerate = async () => {
+    setQuestionsLoading(true);
+    const aiSuccess = await fetchAIQuestions();
+    if (!aiSuccess) {
+      toast({ title: 'AI unavailable', description: 'Keeping current questions.' });
+    } else {
+      toast({ title: '✨ New questions generated!', description: 'AI created fresh questions based on the resume.' });
+    }
+    setQuestionsLoading(false);
+  };
 
   // Get questions for current category
-  const currentQuestions = questions.filter(q => 
-    q.category === questionType || 
+  const currentQuestions = questions.filter(q =>
+    q.category === questionType ||
     (questionType === 'cultural' && q.category === 'cultural_fit')
   );
   const currentQuestion = currentQuestions[selectedQuestion]?.question_text || '';
@@ -75,31 +134,9 @@ const CallSimulator = ({ resumeId, candidateName, department, onComplete }: Call
     setFeedback('');
   };
 
-  const nextQuestion = () => {
-    if (selectedQuestion < currentQuestions.length - 1) {
-      setSelectedQuestion(selectedQuestion + 1);
-      setAnswer('');
-      setScore(5);
-      setFeedback('');
-    }
-  };
-
-  const prevQuestion = () => {
-    if (selectedQuestion > 0) {
-      setSelectedQuestion(selectedQuestion - 1);
-      setAnswer('');
-      setScore(5);
-      setFeedback('');
-    }
-  };
-
   const handleSubmit = async () => {
     if (!user || !answer.trim()) {
-      toast({
-        title: 'Answer required',
-        description: 'Please provide an answer before submitting',
-        variant: 'destructive',
-      });
+      toast({ title: 'Answer required', description: 'Please provide an answer before submitting', variant: 'destructive' });
       return;
     }
 
@@ -113,13 +150,9 @@ const CallSimulator = ({ resumeId, candidateName, department, onComplete }: Call
         score,
         feedback,
       });
-
       if (error) throw error;
 
-      // 🎯 Award points
       const points = score * 2;
-
-      // Fetch current profile
       const { data: profile } = await supabase
         .from('profiles')
         .select('total_points, calls_completed')
@@ -136,40 +169,24 @@ const CallSimulator = ({ resumeId, candidateName, department, onComplete }: Call
           .eq('id', user.id);
       }
 
-      // Evaluate and award badges after completing call
-      try {
-        await evaluateAndAwardBadges(user.id);
-      } catch (error) {
-        console.error('Error evaluating badges:', error);
-      }
+      try { await evaluateAndAwardBadges(user.id); } catch (e) { console.error('Badge error:', e); }
 
-      // ✅ Mark behavioral stage as completed in assessment_progress
-      // Also mark assessment_completed = true since all 3 stages are now done
       await supabase
         .from('assessment_progress')
-        .update({ 
-          behavioral_completed: true,
-          completed_at: new Date().toISOString()
-        })
+        .update({ behavioral_completed: true, completed_at: new Date().toISOString() })
         .eq('resume_id', resumeId)
         .eq('user_id', user.id);
 
-      // Mark first assessment as complete in profile
       await supabase
         .from('profiles')
         .update({ assessment_completed: true })
         .eq('id', user.id);
 
-      toast({
-        title: 'Call simulation saved!',
-        description: `You earned ${points} points! Moving to AI Results...`,
-      });
+      toast({ title: 'Call simulation saved!', description: `You earned ${points} points! Moving to AI Results...` });
 
-      // 🚀 Move to AI results if onComplete provided
       if (onComplete) {
         onComplete();
       } else {
-        // Reset for next question
         setAnswer('');
         setFeedback('');
         setScore(5);
@@ -181,154 +198,199 @@ const CallSimulator = ({ resumeId, candidateName, department, onComplete }: Call
         }
       }
     } catch (error: any) {
-      toast({
-        title: 'Error saving',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Error saving', description: error.message, variant: 'destructive' });
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <Card>
-      <CardHeader>
+    <div className="glass rounded-2xl border border-border/50 glow-purple overflow-hidden">
+      {/* Gradient Header */}
+      <div className="bg-gradient-primary p-6">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              <Phone className="w-5 h-5 text-secondary" />
+            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+              <Phone className="w-6 h-6" />
               Screening Call Simulation
-            </CardTitle>
-            <CardDescription>
-              Practice interviewing {candidateName} for {department}
-            </CardDescription>
+            </h2>
+            <p className="text-white/80 text-sm mt-1">
+              Practice interviewing {candidateName} for {department.replace('_', ' ')}
+            </p>
           </div>
-          <Badge variant="secondary">
-            Question {selectedQuestion + 1} of {currentQuestions.length}
-          </Badge>
+          <div className="flex items-center gap-2">
+            {isAIGenerated && (
+              <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+                <Sparkles className="w-3 h-3 mr-1" /> AI Generated
+              </Badge>
+            )}
+            <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+              Q {selectedQuestion + 1} / {currentQuestions.length}
+            </Badge>
+          </div>
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent className="space-y-6">
-        <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+      <div className="p-6 space-y-6">
+        {/* STAR Method Tip */}
+        <div className="glass rounded-xl p-4 border border-border/30">
           <div className="flex items-start gap-3">
-            <Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+            <div className="p-2 rounded-lg bg-gradient-primary">
+              <Lightbulb className="w-4 h-4 text-white" />
+            </div>
             <div className="text-sm">
-              <p className="font-semibold text-blue-900 dark:text-blue-100">
-                Behavioral Interviewing (STAR Method)
-              </p>
-              <p className="text-blue-700 dark:text-blue-300">
+              <p className="font-semibold text-foreground">Behavioral Interviewing (STAR Method)</p>
+              <p className="text-muted-foreground">
                 Listen for: Situation → Task → Action → Result. Past behavior predicts future performance.
               </p>
             </div>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Question Type</Label>
-            <Select
-              value={questionType}
-              onValueChange={handleQuestionTypeChange}
+        {/* Category Pills */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => handleQuestionTypeChange('behavioral')}
+            className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
+              questionType === 'behavioral'
+                ? 'bg-gradient-primary text-white glow-purple shadow-lg'
+                : 'glass text-muted-foreground hover:text-foreground border border-border/50'
+            }`}
+          >
+            🧠 Behavioral
+          </button>
+          <button
+            onClick={() => handleQuestionTypeChange('cultural')}
+            className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
+              questionType === 'cultural'
+                ? 'bg-gradient-primary text-white glow-purple shadow-lg'
+                : 'glass text-muted-foreground hover:text-foreground border border-border/50'
+            }`}
+          >
+            🤝 Cultural Fit
+          </button>
+
+          {isAIGenerated && (
+            <button
+              onClick={handleRegenerate}
+              disabled={aiLoading}
+              className="ml-auto px-4 py-2.5 rounded-full text-sm font-semibold glass border border-border/50 text-muted-foreground hover:text-foreground transition-all duration-300 flex items-center gap-2 disabled:opacity-50"
             >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="behavioral">Behavioral Questions</SelectItem>
-                <SelectItem value="cultural">Cultural Fit Questions</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {questionsLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading questions...</p>
-            </div>
-          ) : currentQuestions.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No questions available for {questionType}</p>
-            </div>
-          ) : (
-            <Card className="bg-accent/50">
-              <CardContent className="pt-6">
-                <Label className="text-base font-semibold">Question {selectedQuestion + 1}:</Label>
-                <p className="text-lg mt-2">{currentQuestion}</p>
-                {currentQuestions[selectedQuestion]?.hint && (
-                  <p className="text-sm text-muted-foreground mt-2 italic">
-                    💡 {currentQuestions[selectedQuestion].hint}
-                  </p>
-                )}
-                <div className="flex gap-2 mt-4">
-                  {currentQuestions.map((_, idx) => (
-                    <Button
-                      key={idx}
-                      variant={idx === selectedQuestion ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSelectedQuestion(idx)}
-                    >
-                      {idx + 1}
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+              <RefreshCw className={`w-3.5 h-3.5 ${aiLoading ? 'animate-spin' : ''}`} />
+              Regenerate
+            </button>
           )}
+        </div>
 
-          <div className="space-y-2">
-            <Label>Candidate's Response (Simulated)</Label>
-            <Textarea
-              placeholder="Record or imagine the candidate's answer here..."
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              rows={5}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label>Quality Score</Label>
-              <Badge variant="outline">{score}/10</Badge>
+        {/* Questions */}
+        {questionsLoading || aiLoading ? (
+          <div className="text-center py-12">
+            <div className="relative mx-auto w-16 h-16 mb-4">
+              <div className="absolute inset-0 rounded-full bg-gradient-primary animate-spin opacity-30"></div>
+              <div className="absolute inset-1 rounded-full bg-background flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-primary animate-pulse" />
+              </div>
             </div>
-            <div className="flex gap-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                <Button
-                  key={num}
-                  variant={score >= num ? 'default' : 'outline'}
-                  size="sm"
-                  className="flex-1"
-                  onClick={() => setScore(num)}
+            <p className="text-muted-foreground font-medium">
+              {aiLoading ? '✨ AI is crafting tailored questions...' : 'Loading questions...'}
+            </p>
+          </div>
+        ) : currentQuestions.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No {questionType} questions available</p>
+          </div>
+        ) : (
+          <div className="glass rounded-xl p-6 border border-border/30 space-y-4">
+            <div>
+              <Label className="text-base font-bold text-gradient">Question {selectedQuestion + 1}</Label>
+              <p className="text-lg mt-2 text-foreground leading-relaxed">{currentQuestion}</p>
+              {currentQuestions[selectedQuestion]?.hint && (
+                <p className="text-sm text-muted-foreground mt-3 italic flex items-start gap-2">
+                  <Lightbulb className="w-4 h-4 mt-0.5 text-primary shrink-0" />
+                  {currentQuestions[selectedQuestion].hint}
+                </p>
+              )}
+            </div>
+            {/* Question Nav Dots */}
+            <div className="flex gap-2 flex-wrap">
+              {currentQuestions.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => { setSelectedQuestion(idx); setAnswer(''); setScore(5); setFeedback(''); }}
+                  className={`w-9 h-9 rounded-full text-sm font-bold transition-all duration-300 ${
+                    idx === selectedQuestion
+                      ? 'bg-gradient-primary text-white glow-purple scale-110'
+                      : 'glass border border-border/50 text-muted-foreground hover:text-foreground hover:scale-105'
+                  }`}
                 >
-                  {num}
-                </Button>
+                  {idx + 1}
+                </button>
               ))}
             </div>
           </div>
+        )}
 
-          <div className="space-y-2">
-            <Label>Interviewer Notes</Label>
-            <Textarea
-              placeholder="Add notes about STAR method, red flags, or follow-up questions..."
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              rows={4}
-            />
+        {/* Response */}
+        <div className="space-y-2">
+          <Label className="font-semibold">Candidate's Response (Simulated)</Label>
+          <Textarea
+            placeholder="Record or imagine the candidate's answer here..."
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            rows={5}
+            className="glass border-border/50 focus:glow-purple transition-shadow"
+          />
+        </div>
+
+        {/* Score */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label className="font-semibold">Quality Score</Label>
+            <Badge className="bg-gradient-primary text-white border-0 text-base px-3 py-1">
+              {score}/10
+            </Badge>
+          </div>
+          <div className="flex gap-1.5">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+              <button
+                key={num}
+                onClick={() => setScore(num)}
+                className={`flex-1 h-10 rounded-lg text-sm font-bold transition-all duration-200 ${
+                  score >= num
+                    ? 'bg-gradient-primary text-white shadow-lg'
+                    : 'glass border border-border/50 text-muted-foreground hover:text-foreground hover:scale-105'
+                }`}
+              >
+                {num}
+              </button>
+            ))}
           </div>
         </div>
 
+        {/* Notes */}
+        <div className="space-y-2">
+          <Label className="font-semibold">Interviewer Notes</Label>
+          <Textarea
+            placeholder="Add notes about STAR method, red flags, or follow-up questions..."
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+            rows={4}
+            className="glass border-border/50 focus:glow-purple transition-shadow"
+          />
+        </div>
+
+        {/* Submit */}
         <Button
           onClick={handleSubmit}
           disabled={saving || !answer.trim()}
           size="lg"
-          className="w-full"
+          className="w-full bg-gradient-primary hover:opacity-90 text-white font-bold text-base glow-purple transition-all duration-300"
         >
           <Send className="w-4 h-4 mr-2" />
-          {saving ? 'Saving...' : 'Submit & Next Question'}
+          {saving ? 'Saving...' : 'Submit & Complete'}
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

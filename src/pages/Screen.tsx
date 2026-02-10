@@ -491,6 +491,7 @@ const Screen = () => {
                 resumeId={resume.id}
                 candidateName={resume.candidate_name}
                 department={resume.department}
+                resumeText={resumeText}
                 onComplete={handleCallComplete}
               />
             </TabsContent>
