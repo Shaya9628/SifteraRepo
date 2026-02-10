@@ -20,6 +20,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AIResults from "./pages/AIResults";
 import FreeScreen from "./pages/FreeScreen";
 import { ProfileCompletion } from "./pages/ProfileCompletion";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,6 +48,7 @@ const App = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/dashboard/profile" element={<Profile />} />
                 <Route path="/dashboard/ai-results" element={<AIResults />} />
+                <Route path="/dashboard/settings" element={<Settings />} />
                 <Route path="/screen/:id" element={<Screen />} />
                 <Route path="/admin/auth" element={<AdminAuth />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
