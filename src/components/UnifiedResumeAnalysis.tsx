@@ -351,8 +351,8 @@ const UnifiedResumeAnalysis = ({ resumeId, resumeText, candidateName, department
     if (analyzing) {
       return (
         <>
-          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          Analyzing All Stages...
+          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+          🔥 Battle in Progress...
         </>
       );
     }
@@ -360,42 +360,48 @@ const UnifiedResumeAnalysis = ({ resumeId, resumeText, candidateName, department
     if (!canAnalyze) {
       return (
         <>
-          <AlertTriangle className="w-4 h-4 mr-2" />
-          Complete All Stages First
+          <AlertTriangle className="w-5 h-5 mr-2 animate-pulse" />
+          Complete Stages to Battle!
         </>
       );
     }
     
     return (
       <>
-        <Sparkles className="w-4 h-4 mr-2" />
-        Compare with AI Analysis
+        <Sparkles className="w-5 h-5 mr-2 animate-bounce" />
+        ⚡ START AI BATTLE
       </>
     );
   };
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
+      <Card className="glass-strong border-2 border-purple-500/30 hover:border-cyan-400/50 transition-all duration-300 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 via-blue-600/5 to-cyan-500/5 animate-gradient"></div>
+        <CardHeader className="relative z-10">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" />
-                AI-Powered Resume Analysis
+              <CardTitle className="flex items-center gap-2 text-2xl glow-purple bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                <Sparkles className="w-6 h-6 text-purple-400 animate-pulse drop-shadow-lg" />
+                AI Battle Arena 🔥
               </CardTitle>
-              <CardDescription>
-                Comprehensive screening for {candidateName} - {department}
+              <CardDescription className="text-gray-300 text-lg mt-2">
+                Epic showdown: You vs AI for {candidateName} - {department}
               </CardDescription>
               {assessmentStatus.length > 0 && (
-                <div className="mt-2">
-                  <div className="text-sm text-muted-foreground mb-1">
-                    Complete these stages for AI analysis:
+                <div className="mt-4 p-4 glass-strong border border-orange-400/40 rounded-xl">
+                  <div className="text-sm text-orange-300 mb-2 font-semibold animate-pulse">
+                    🎯 Complete these stages to unleash AI power:
                   </div>
                   <div className="flex gap-2 flex-wrap">
                     {assessmentStatus.map((stage, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs">
-                        {stage}
+                      <Badge 
+                        key={idx} 
+                        variant="outline" 
+                        className="text-xs border-yellow-400/60 text-yellow-300 hover:glow-yellow animate-bounce"
+                        style={{ animationDelay: `${idx * 100}ms` }}
+                      >
+                        ⚡ {stage}
                       </Badge>
                     ))}
                   </div>
@@ -406,112 +412,212 @@ const UnifiedResumeAnalysis = ({ resumeId, resumeText, candidateName, department
               <Button 
                 onClick={handleAIAnalysis} 
                 disabled={analyzing || !canAnalyze}
-                variant={canAnalyze ? "default" : "outline"}
+                className={canAnalyze 
+                  ? "glass-strong border-2 border-purple-400/60 hover:glow-purple hover:scale-110 bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-bold text-lg px-8 py-3 transition-all duration-300 animate-pulse" 
+                  : "glass-strong border-2 border-gray-500/40 text-gray-400 cursor-not-allowed"
+                }
               >
                 {getButtonContent()}
               </Button>
             )}
             {existingReport && (
-              <Badge variant="secondary" className="text-sm">
-                Completed Assessment
+              <Badge 
+                variant="secondary" 
+                className="text-sm glass-strong border-2 border-green-400/60 text-green-400 glow-green px-4 py-2 animate-pulse"
+              >
+                ✅ Battle Complete!
               </Badge>
             )}
           </div>
         </CardHeader>
         
         {loading && (
-          <CardContent>
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              <span className="ml-2 text-muted-foreground">Loading assessment data...</span>
+          <CardContent className="relative z-10">
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center space-y-4">
+                <Loader2 className="w-12 h-12 animate-spin text-purple-400 mx-auto drop-shadow-lg" />
+                <div className="space-y-2">
+                  <div className="text-lg font-semibold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                    Loading battle data...
+                  </div>
+                  <div className="text-sm text-gray-400 animate-pulse">
+                    Preparing for epic AI showdown ⚡
+                  </div>
+                </div>
+              </div>
             </div>
           </CardContent>
         )}
         
         {aiAnalysis && (
-          <CardContent>
+          <CardContent className="relative z-10">
             <Tabs defaultValue="scores" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="scores">
-                  <Trophy className="w-4 h-4 mr-2" />
-                  Scores
+              <TabsList className="grid w-full grid-cols-4 glass-strong border-2 border-purple-400/30 bg-gradient-to-r from-purple-900/20 to-cyan-900/20 p-2 rounded-2xl">
+                <TabsTrigger 
+                  value="scores"
+                  className="data-[state=active]:glass-strong data-[state=active]:border-2 data-[state=active]:border-purple-400/60 data-[state=active]:glow-purple data-[state=active]:text-purple-300 hover:glow-purple transition-all duration-300"
+                >
+                  <Trophy className="w-4 h-4 mr-2 animate-bounce" />
+                  Battle Scores
                 </TabsTrigger>
-                <TabsTrigger value="flags">
+                <TabsTrigger 
+                  value="flags"
+                  className="data-[state=active]:glass-strong data-[state=active]:border-2 data-[state=active]:border-red-400/60 data-[state=active]:glow-red data-[state=active]:text-red-300 hover:glow-red transition-all duration-300"
+                >
                   <Flag className="w-4 h-4 mr-2" />
-                  Red Flags ({aiAnalysis.red_flags?.length || 0})
+                  🚩 Flags ({aiAnalysis.red_flags?.length || 0})
                 </TabsTrigger>
-                <TabsTrigger value="interview">
+                <TabsTrigger 
+                  value="interview"
+                  className="data-[state=active]:glass-strong data-[state=active]:border-2 data-[state=active]:border-blue-400/60 data-[state=active]:glow-blue data-[state=active]:text-blue-300 hover:glow-blue transition-all duration-300"
+                >
                   <Phone className="w-4 h-4 mr-2" />
-                  Questions ({aiAnalysis.interview_questions?.length || 0})
+                  💬 Questions ({aiAnalysis.interview_questions?.length || 0})
                 </TabsTrigger>
-                <TabsTrigger value="summary">
+                <TabsTrigger 
+                  value="summary"
+                  className="data-[state=active]:glass-strong data-[state=active]:border-2 data-[state=active]:border-green-400/60 data-[state=active]:glow-green data-[state=active]:text-green-300 hover:glow-green transition-all duration-300"
+                >
                   <AlertTriangle className="w-4 h-4 mr-2" />
-                  Summary
+                  📊 Final Verdict
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="scores" className="space-y-6 mt-6">
-                <div className="grid grid-cols-2 gap-6 mb-8">
-                  <Card className="bg-secondary/20 border-secondary">
-                    <CardContent className="pt-6">
+                {/* Epic Battle Arena Header */}
+                <div className="text-center py-6 relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-pink-600/10 to-cyan-500/10 rounded-3xl animate-gradient"></div>
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent relative z-10 mb-2">
+                    ⚡ ULTIMATE SCORING BATTLE ⚡
+                  </h2>
+                  <p className="text-gray-400 relative z-10">Who scored it better? Let's find out! 🔥</p>
+                </div>
+
+                {/* Battle Arena Scores */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                  {/* Your Score - Left Corner */}
+                  <Card className="glass-strong border-2 border-blue-400/60 hover:glow-blue hover:scale-105 transition-all duration-500 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-500/20 animate-gradient"></div>
+                    <CardContent className="pt-8 relative z-10">
                       <div className="text-center">
-                        <div className="text-sm text-muted-foreground mb-2">Your Score</div>
-                        <div className="text-5xl font-bold text-secondary mb-2">
-                          {aiAnalysis.user_total_score !== undefined ? Math.round(aiAnalysis.user_total_score) : '-'}
+                        <div className="text-lg text-blue-300 mb-3 font-bold">👤 YOUR BATTLE SCORE</div>
+                        <div className="relative mb-6">
+                          <div className="text-7xl font-black bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-2 drop-shadow-lg animate-pulse">
+                            {aiAnalysis.user_total_score !== undefined ? Math.round(aiAnalysis.user_total_score) : '?'}
+                          </div>
+                          <div className="absolute -top-2 -right-2 text-2xl animate-bounce">💪</div>
                         </div>
-                        <div className="text-xs text-muted-foreground">Out of 100</div>
+                        <div className="text-sm text-blue-200/80 font-medium">Out of 100 points</div>
+                        <div className="mt-3 text-xs text-blue-300/60 animate-pulse">Human intuition power!</div>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-primary/20 border-primary">
-                    <CardContent className="pt-6">
+                  {/* AI Score - Right Corner */}
+                  <Card className="glass-strong border-2 border-purple-400/60 hover:glow-purple hover:scale-105 transition-all duration-500 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-pink-500/20 animate-gradient"></div>
+                    <CardContent className="pt-8 relative z-10">
                       <div className="text-center">
-                        <div className="text-sm text-muted-foreground mb-2">AI Score</div>
-                        <div className="text-5xl font-bold text-primary mb-2">
-                          {aiAnalysis.ai_total_score !== undefined ? Math.round(aiAnalysis.ai_total_score) : '-'}
+                        <div className="text-lg text-purple-300 mb-3 font-bold">🤖 AI BATTLE SCORE</div>
+                        <div className="relative mb-6">
+                          <div className="text-7xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2 drop-shadow-lg animate-pulse">
+                            {aiAnalysis.ai_total_score !== undefined ? Math.round(aiAnalysis.ai_total_score) : '?'}
+                          </div>
+                          <div className="absolute -top-2 -right-2 text-2xl animate-bounce">🧠</div>
                         </div>
-                        <div className="text-xs text-muted-foreground">Out of 100</div>
+                        <div className="text-sm text-purple-200/80 font-medium">Out of 100 points</div>
+                        <div className="mt-3 text-xs text-purple-300/60 animate-pulse">Neural network magic!</div>
                       </div>
                     </CardContent>
                   </Card>
                 </div>
 
-                <Card className="mb-6">
+                {/* Winner Declaration */}
+                {aiAnalysis.user_total_score !== undefined && aiAnalysis.ai_total_score !== undefined && (
+                  <div className="text-center py-6">
+                    <div className="glass-strong border-2 border-yellow-400/60 rounded-2xl p-6 glow-yellow">
+                      <div className="text-2xl mb-3">
+                        {Math.round(aiAnalysis.user_total_score) > Math.round(aiAnalysis.ai_total_score) ? '🏆 YOU WON!' : 
+                         Math.round(aiAnalysis.user_total_score) < Math.round(aiAnalysis.ai_total_score) ? '🤖 AI WINS!' : 
+                         '🤝 EPIC TIE!'}
+                      </div>
+                      <div className="text-sm text-yellow-300">
+                        Score difference: {Math.abs(Math.round(aiAnalysis.user_total_score) - Math.round(aiAnalysis.ai_total_score))} points
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <Card className="glass-strong border-2 border-cyan-400/40 hover:border-cyan-400/60 transition-all duration-300">
                   <CardHeader>
-                    <CardTitle className="text-lg">Comparative Analysis</CardTitle>
-                    <CardDescription>See how your assessment compares to AI evaluation</CardDescription>
+                    <CardTitle className="text-xl bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent flex items-center gap-2">
+                      <div className="animate-bounce">⚔️</div>
+                      Category-by-Category Battle
+                    </CardTitle>
+                    <CardDescription className="text-gray-300">Round-by-round breakdown of the scoring battle</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {aiAnalysis.comparative_feedback?.map((item: any, idx: number) => (
-                      <div key={idx} className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <Label className="text-base font-semibold capitalize">
-                            {item.category.replace('_', ' ')}
+                      <div 
+                        key={idx} 
+                        className="glass-strong border border-purple-400/30 hover:border-purple-400/60 rounded-xl p-6 transition-all duration-300 hover:glow-purple"
+                        style={{ animationDelay: `${idx * 100}ms` }}
+                      >
+                        <div className="flex items-center justify-between mb-4">
+                          <Label className="text-lg font-bold capitalize bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                            {item.category.replace('_', ' ')} Battle
                           </Label>
-                          <Badge variant={
-                            item.performance === 'excellent' ? 'default' : 
-                            item.performance === 'good' ? 'secondary' : 
-                            'destructive'
-                          }>
-                            {item.performance}
+                          <Badge 
+                            className={
+                              item.performance === 'excellent' 
+                                ? 'glass-strong border border-green-400/60 text-green-400 glow-green animate-pulse' 
+                                : item.performance === 'good' 
+                                ? 'glass-strong border border-yellow-400/60 text-yellow-400 glow-yellow' 
+                                : 'glass-strong border border-red-400/60 text-red-400 glow-red'
+                            }
+                          >
+                            {item.performance === 'excellent' ? '🔥 EXCELLENT' : 
+                             item.performance === 'good' ? '👍 GOOD' : 
+                             '⚠️ NEEDS WORK'}
                           </Badge>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-1">
-                            <div className="text-xs text-muted-foreground">Your Score</div>
-                            <Progress value={item.user_score} className="h-2" />
-                            <div className="text-sm font-medium">{item.user_score}/100</div>
+                        
+                        {/* Battle Bars */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <div className="text-sm text-blue-300 font-semibold">👤 Your Power</div>
+                              <div className="text-lg font-bold text-blue-400">{item.user_score}/100</div>
+                            </div>
+                            <div className="relative">
+                              <Progress 
+                                value={item.user_score} 
+                                className="h-4 bg-gray-800/50 rounded-full overflow-hidden"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-full animate-pulse"></div>
+                            </div>
                           </div>
-                          <div className="space-y-1">
-                            <div className="text-xs text-muted-foreground">AI Score</div>
-                            <Progress value={item.ai_score} className="h-2" />
-                            <div className="text-sm font-medium">{item.ai_score}/100</div>
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <div className="text-sm text-purple-300 font-semibold">🤖 AI Power</div>
+                              <div className="text-lg font-bold text-purple-400">{item.ai_score}/100</div>
+                            </div>
+                            <div className="relative">
+                              <Progress 
+                                value={item.ai_score} 
+                                className="h-4 bg-gray-800/50 rounded-full overflow-hidden"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full animate-pulse"></div>
+                            </div>
                           </div>
                         </div>
-                        <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-md">
-                          {item.feedback}
-                        </p>
+                        
+                        {/* Battle Commentary */}
+                        <div className="glass-strong border border-gray-600/30 rounded-lg p-4 bg-gradient-to-r from-gray-900/40 to-gray-800/40">
+                          <div className="text-sm text-gray-300 leading-relaxed">
+                            <span className="text-cyan-400 font-semibold">💬 Battle Analysis:</span> {item.feedback}
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </CardContent>
@@ -520,8 +626,14 @@ const UnifiedResumeAnalysis = ({ resumeId, resumeText, candidateName, department
 
               <TabsContent value="flags" className="space-y-4 mt-6">
                 {!aiAnalysis.red_flags || aiAnalysis.red_flags.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No red flags detected
+                  <div className="text-center py-12">
+                    <div className="glass-strong border-2 border-green-400/60 rounded-2xl p-8 glow-green">
+                      <div className="text-6xl mb-4">🎉</div>
+                      <div className="text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-2">
+                        All Clear!
+                      </div>
+                      <div className="text-green-300">NO red flags detected - This candidate is looking awesome! ✨</div>
+                    </div>
                   </div>
                 ) : (
                   aiAnalysis.red_flags.map((flag: any, idx: number) => (

@@ -44,13 +44,21 @@ export const GoogleLoginButton = ({
   return (
     <Button
       type="button"
-      variant="outline"
-      className="w-full h-12 text-base font-medium border-2 hover:bg-muted/50 transition-colors"
+      className="w-full h-14 text-lg font-semibold glass-strong border-2 border-white/20 hover:glow-cyan hover:scale-[1.02] transition-all duration-300 backdrop-blur-xl bg-gradient-to-r from-white/10 to-white/5 text-white group"
       onClick={handleGoogleSignIn}
       disabled={isLoading}
     >
-      <FcGoogle className="w-5 h-5 mr-3" />
-      {isLoading ? "Connecting..." : "Continue with Google"}
+      {isLoading ? (
+        <>
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3" />
+          Connecting magic...
+        </>
+      ) : (
+        <>
+          <FcGoogle className="w-6 h-6 mr-3 group-hover:animate-bounce transition-transform" />
+          Continue with Google ✨
+        </>
+      )}
     </Button>
   );
 };

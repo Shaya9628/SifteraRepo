@@ -10,6 +10,9 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import { Domain, GLOBAL_DOMAINS } from '@/lib/constants/domains';
+import { getPositionsForDomain } from '@/lib/constants/positions';
+import { DualDomainPositionSelector } from '@/components/DualDomainPositionSelector';
 import { 
   Upload, 
   FileText, 
@@ -20,7 +23,8 @@ import {
   Download,
   User,
   Building,
-  Globe
+  Globe,
+  Sparkles
 } from 'lucide-react';
 
 interface UploadFile {
@@ -28,7 +32,8 @@ interface UploadFile {
   file: File;
   candidateName: string;
   department: string;
-  domain: string;
+  domain: Domain;
+  position?: string;
   isPoolResume: boolean;
   status: 'pending' | 'uploading' | 'success' | 'error';
   progress: number;
@@ -59,7 +64,8 @@ export const ModernResumeUpload = ({ onUploadComplete, mode = 'single' }: Modern
   const [users, setUsers] = useState<User[]>([]);
   const [defaultUserId, setDefaultUserId] = useState('');
   const [defaultDepartment, setDefaultDepartment] = useState('');
-  const [defaultDomain, setDefaultDomain] = useState('');
+  const [defaultDomain, setDefaultDomain] = useState<Domain | null>(null);
+  const [defaultPosition, setDefaultPosition] = useState<string | null>(null);
   const [defaultIsPoolResume, setDefaultIsPoolResume] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [globalProgress, setGlobalProgress] = useState(0);
@@ -180,7 +186,8 @@ export const ModernResumeUpload = ({ onUploadComplete, mode = 'single' }: Modern
         file,
         candidateName,
         department: defaultDepartment || 'sales',
-        domain: defaultDomain || 'sales',
+        domain: (defaultDomain || 'sales') as Domain,
+        position: defaultPosition || undefined,
         isPoolResume: defaultIsPoolResume,
         userId: defaultUserId,
         status: 'pending',
@@ -210,7 +217,7 @@ export const ModernResumeUpload = ({ onUploadComplete, mode = 'single' }: Modern
     if (droppedFiles.length > 0) {
       handleFiles(droppedFiles);
     }
-  }, [files, defaultDepartment, defaultDomain, defaultIsPoolResume, defaultUserId, mode]);
+  }, [files, defaultDepartment, defaultDomain, defaultPosition, defaultIsPoolResume, defaultUserId, mode]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -273,6 +280,7 @@ export const ModernResumeUpload = ({ onUploadComplete, mode = 'single' }: Modern
           candidate_name: uploadFile.candidateName.trim(),
           department: uploadFile.department,
           domain: uploadFile.domain,
+          position: uploadFile.position || null,
           file_path: fileName,
           is_pool_resume: isAdmin ? uploadFile.isPoolResume : false, // Only admins can add to pool
         });
@@ -389,22 +397,21 @@ export const ModernResumeUpload = ({ onUploadComplete, mode = 'single' }: Modern
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full glass-strong border-2 border-white/10">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Upload className="w-5 h-5" />
+        <CardTitle className="flex items-center gap-2 text-gradient-neon animate-gradient">          <Upload className="w-5 h-5 text-neon-purple" />
           {mode === 'bulk' ? 'Bulk Resume Upload' : 'Resume Upload'}
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-sm text-white/70">
           {mode === 'bulk' 
-            ? 'Upload multiple resumes with drag-and-drop (max 10MB per file)'
-            : 'Upload a single resume file (max 10MB)'
+            ? '✨ Which Domain and which position you are assessing these resumes? Upload multiple with drag-and-drop (max 10MB per file)'
+            : '✨ Which Domain and which position you are assessing this resume? Upload single file (max 10MB)'
           }
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Default settings for new files */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 glass rounded-xl border border-white/20">
           {isAdmin && (
             <div className="space-y-2">
               <Label className="text-sm font-medium flex items-center gap-2">
@@ -444,19 +451,65 @@ export const ModernResumeUpload = ({ onUploadComplete, mode = 'single' }: Modern
 
           <div className="space-y-2">
             <Label className="text-sm font-medium flex items-center gap-2">
-              <Globe className="w-4 h-4" />
+              <Globe className="w-4 h-4 text-neon-purple" />
               Default Domain *
             </Label>
-            <Select value={defaultDomain} onValueChange={setDefaultDomain}>
-              <SelectTrigger>
+            <Select 
+              value={defaultDomain || ''} 
+              onValueChange={(value) => setDefaultDomain(value as Domain)}
+            >
+              <SelectTrigger className="glass border-neon-purple/30 focus:glow-purple">
                 <SelectValue placeholder="Select domain" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="sales">Sales</SelectItem>
-                <SelectItem value="crm">CRM</SelectItem>
+              <SelectContent className="glass-strong border-neon-purple/20">
+                {GLOBAL_DOMAINS.map((domain) => (
+                  <SelectItem key={domain.value} value={domain.value}>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">{domain.icon}</span>
+                      {domain.label}
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
+
+          {defaultDomain && (
+            <div className="space-y-2">
+              <Label className="text-sm font-medium flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-neon-cyan" />
+                Default Position
+              </Label>
+              <Select 
+                value={defaultPosition || ''} 
+                onValueChange={setDefaultPosition}
+              >
+                <SelectTrigger className="glass border-neon-cyan/30 focus:glow-cyan">
+                  <SelectValue placeholder="Select position" />
+                </SelectTrigger>
+                <SelectContent className="glass-strong border-neon-cyan/20">
+                  {getPositionsForDomain(defaultDomain).map((position) => (
+                    <SelectItem key={position.value} value={position.value}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">
+                          {position.level === 'junior' && '🌱'}
+                          {position.level === 'mid' && '📈'}
+                          {position.level === 'senior' && '🎯'}
+                          {position.level === 'executive' && '👑'}
+                        </span>
+                        <div className="flex flex-col">
+                          <span>{position.label}</span>
+                          {position.yearRange && (
+                            <span className="text-xs text-muted-foreground">{position.yearRange}</span>
+                          )}
+                        </div>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {isAdmin && (
             <div className="flex items-center space-x-2">
@@ -479,21 +532,21 @@ export const ModernResumeUpload = ({ onUploadComplete, mode = 'single' }: Modern
           onDragLeave={handleDragLeave}
           onClick={() => fileInputRef.current?.click()}
           className={`
-            border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
+            glass-strong border-2 border-dashed rounded-3xl p-8 text-center cursor-pointer transition-all duration-300 hover-lift
             ${isDragOver 
-              ? 'border-primary bg-primary/10' 
-              : 'border-muted-foreground/25 hover:border-muted-foreground/50'
+              ? 'border-neon-cyan glow-cyan scale-[1.02] bg-neon-cyan/5' 
+              : 'border-white/30 hover:border-neon-purple/50 hover:glow-purple'
             }
           `}
         >
-          <Upload className="w-8 h-8 mx-auto mb-4 text-muted-foreground" />
+          <Upload className="w-8 h-8 mx-auto mb-4 text-neon-purple animate-float" />
           <p className="text-lg font-medium mb-2">
             {isDragOver ? 'Drop files here' : 'Drag & drop files or click to browse'}
           </p>
           <p className="text-sm text-muted-foreground mb-4">
             Supports: PDF, DOC, DOCX (max 10MB each)
           </p>
-          <Button variant="outline" type="button">
+          <Button variant="outline" type="button" className="glass border-neon-purple/50 hover:glow-purple hover:scale-105 transition-all duration-300">
             <FileText className="w-4 h-4 mr-2" />
             Select Files
           </Button>
@@ -527,7 +580,7 @@ export const ModernResumeUpload = ({ onUploadComplete, mode = 'single' }: Modern
 
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {files.map((file) => (
-                <Card key={file.id} className="p-4">
+                <Card key={file.id} className="p-4 glass border border-white/20 hover:border-neon-purple/50 transition-all duration-300 hover-glow">
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0">
                       {getStatusIcon(file.status)}
@@ -620,20 +673,61 @@ export const ModernResumeUpload = ({ onUploadComplete, mode = 'single' }: Modern
                           </div>
 
                           <div className="space-y-1">
-                            <Label className="text-xs">Domain *</Label>
+                            <Label className="text-xs flex items-center gap-1">
+                              <Globe className="w-3 h-3 text-neon-purple" />
+                              Domain *
+                            </Label>
                             <Select
                               value={file.domain}
-                              onValueChange={(value) => updateFile(file.id, { domain: value })}
+                              onValueChange={(value) => updateFile(file.id, { domain: value as Domain, position: undefined })}
                             >
-                              <SelectTrigger>
+                              <SelectTrigger className="glass border-neon-purple/30 focus:glow-purple">
                                 <SelectValue placeholder="Select domain" />
                               </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="sales">Sales</SelectItem>
-                                <SelectItem value="crm">CRM</SelectItem>
+                              <SelectContent className="glass-strong">
+                                {GLOBAL_DOMAINS.map((domain) => (
+                                  <SelectItem key={domain.value} value={domain.value}>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-xs">{domain.icon}</span>
+                                      <span className="text-xs">{domain.label}</span>
+                                    </div>
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                           </div>
+
+                          {file.domain && (
+                            <div className="space-y-1">
+                              <Label className="text-xs flex items-center gap-1">
+                                <Sparkles className="w-3 h-3 text-neon-cyan" />
+                                Position
+                              </Label>
+                              <Select
+                                value={file.position || ''}
+                                onValueChange={(value) => updateFile(file.id, { position: value })}
+                              >
+                                <SelectTrigger className="glass border-neon-cyan/30 focus:glow-cyan">
+                                  <SelectValue placeholder="Select position" />
+                                </SelectTrigger>
+                                <SelectContent className="glass-strong">
+                                  {getPositionsForDomain(file.domain).map((position) => (
+                                    <SelectItem key={position.value} value={position.value}>
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-xs">
+                                          {position.level === 'junior' && '🌱'}
+                                          {position.level === 'mid' && '📈'}
+                                          {position.level === 'senior' && '🎯'}
+                                          {position.level === 'executive' && '👑'}
+                                        </span>
+                                        <span className="text-xs">{position.label}</span>
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
 
                           <div className="md:col-span-2 flex items-center space-x-2">
                             <Checkbox
@@ -670,7 +764,7 @@ export const ModernResumeUpload = ({ onUploadComplete, mode = 'single' }: Modern
         <Button
           onClick={handleUpload}
           disabled={files.length === 0 || isUploading || !defaultUserId || !defaultDepartment || !defaultDomain}
-          className="w-full"
+          className="w-full glass-strong border-2 border-neon-purple hover:glow-purple hover:scale-[1.02] transition-all duration-300 bg-gradient-to-r from-neon-purple to-neon-pink text-white font-semibold"
           size="lg"
         >
           {isUploading ? (

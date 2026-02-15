@@ -2,9 +2,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Building2, Users } from 'lucide-react';
-
-type Domain = 'Sales' | 'CRM';
+import { Building2 } from 'lucide-react';
+import { Domain, GLOBAL_DOMAINS } from '@/lib/constants/domains';
 
 interface DomainSwitcherProps {
   currentDomain: Domain;
@@ -13,29 +12,13 @@ interface DomainSwitcherProps {
   showDescription?: boolean;
 }
 
-const DOMAIN_INFO = {
-  Sales: {
-    label: 'Sales',
-    icon: Building2,
-    color: 'bg-blue-500 text-white',
-    description: 'Sales processes, lead management, and revenue generation'
-  },
-  CRM: {
-    label: 'Customer Relationship Management', 
-    icon: Users,
-    color: 'bg-green-500 text-white',
-    description: 'Customer service, support, and relationship management'
-  }
-};
-
 export const DomainSwitcher: React.FC<DomainSwitcherProps> = ({
   currentDomain,
   onDomainChange,
   disabled = false,
   showDescription = true,
 }) => {
-  const currentDomainInfo = DOMAIN_INFO[currentDomain];
-  const Icon = currentDomainInfo.icon;
+  const currentDomainInfo = GLOBAL_DOMAINS.find(d => d.value === currentDomain);
 
   return (
     <Card>
@@ -48,9 +31,9 @@ export const DomainSwitcher: React.FC<DomainSwitcherProps> = ({
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Badge className={currentDomainInfo.color}>
-              <Icon className="h-4 w-4 mr-2" />
-              {currentDomainInfo.label}
+            <Badge className="bg-primary text-primary-foreground">
+              <span className="text-lg mr-2">{currentDomainInfo?.icon}</span>
+              {currentDomainInfo?.label}
             </Badge>
           </div>
           
@@ -63,26 +46,22 @@ export const DomainSwitcher: React.FC<DomainSwitcherProps> = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Sales">
-                <div className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4" />
-                  Sales
-                </div>
-              </SelectItem>
-              <SelectItem value="CRM">
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  CRM
-                </div>
-              </SelectItem>
+              {GLOBAL_DOMAINS.map((domain) => (
+                <SelectItem key={domain.value} value={domain.value}>
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{domain.icon}</span>
+                    <span className="text-sm">{domain.label}</span>
+                  </div>
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
 
-        {showDescription && (
+        {showDescription && currentDomainInfo && (
           <div className="bg-muted/50 p-3 rounded-lg">
             <p className="text-sm text-muted-foreground">
-              <strong>{currentDomainInfo.label}:</strong> {currentDomainInfo.description}
+              <strong>{currentDomainInfo.label}:</strong> Professional assessment and training focused on {currentDomainInfo.label.toLowerCase()} expertise.
             </p>
           </div>
         )}

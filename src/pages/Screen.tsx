@@ -52,29 +52,29 @@ const Screen = () => {
 
   const handleScorecardComplete = () => {
     setShowStepTransition(true);
-    setTransitionMessage('Great job! Now let\'s check for any red flags in the resume...');
+    setTransitionMessage('🔥 SCORECARD CRUSHED! Time to hunt for red flags like a detective 🕵️‍♂️');
     
     setTimeout(() => {
       setScorecardCompleted(true);
       setActiveTab('red-flags');
       setShowStepTransition(false);
-    }, 3000);
+    }, 3500);
   };
 
   const handleRedFlagsComplete = () => {
     setShowStepTransition(true);
-    setTransitionMessage('📞 Get ready to call the candidate! Prepare for the screening call...');
+    setTransitionMessage('📞 RING RING! Time to channel your inner recruiter and make the call! ☎️✨');
     
     setTimeout(() => {
       setRedFlagsCompleted(true);
       setActiveTab('call');
       setShowStepTransition(false);
-    }, 4000);
+    }, 4500);
   };
 
   const handleCallComplete = () => {
     setShowStepTransition(true);
-    setTransitionMessage('🤖 AI is analyzing your assessment... This might take a moment...');
+    setTransitionMessage('🔥 BOOM! AI is about to roast your assessment... Prepare for the ultimate battle! 🤖⚡');
     setIsAnalyzing(true);
     
     setTimeout(() => {
@@ -82,7 +82,7 @@ const Screen = () => {
       setActiveTab('ai-results');
       setShowStepTransition(false);
       setIsAnalyzing(false);
-    }, 5000);
+    }, 6000);
   };
 
   useEffect(() => {
@@ -405,54 +405,63 @@ const Screen = () => {
 
         {/* Screening Tools */}
         <div className="lg:col-span-2">
-          {/* Step Transition Animation */}
+          {/* EPIC CINEMATIC TRANSITION */}
           {showStepTransition && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-              <Card className="w-full max-w-md mx-4">
-                <CardContent className="p-8 text-center">
-                  <div className="space-y-6">
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-lg flex items-center justify-center z-50 animate-fadeIn">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 via-blue-600/20 to-cyan-500/20 animate-gradient"></div>
+              <Card className="glass-strong border-2 border-purple-400/60 w-full max-w-lg mx-4 relative z-10 animate-slideUp">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-blue-900/40 to-cyan-900/40 rounded-lg animate-gradient"></div>
+                <CardContent className="p-12 text-center relative z-10">
+                  <div className="space-y-8">
                     {isAnalyzing ? (
                       <div className="flex items-center justify-center">
                         <div className="relative">
-                          <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                          <div className="w-24 h-24 border-4 border-purple-400/30 border-t-purple-400 rounded-full animate-spin"></div>
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-2xl animate-pulse">🤖</span>
+                            <div className="w-16 h-16 glass-strong border border-purple-400/60 rounded-full flex items-center justify-center animate-pulse glow-purple">
+                              <span className="text-3xl animate-bounce">🤖</span>
+                            </div>
                           </div>
+                          <div className="absolute -inset-8 border-2 border-purple-400/20 rounded-full animate-ping"></div>
                         </div>
                       </div>
                     ) : transitionMessage.includes('📞') ? (
                       <div className="flex items-center justify-center">
                         <div className="relative">
-                          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center animate-pulse">
-                            <span className="text-3xl animate-bounce">📞</span>
+                          <div className="w-24 h-24 glass-strong border-2 border-green-400/60 rounded-full flex items-center justify-center animate-pulse glow-green">
+                            <span className="text-4xl animate-bounce">📞</span>
                           </div>
-                          <div className="absolute -inset-4 border-2 border-green-300 rounded-full animate-ping"></div>
+                          <div className="absolute -inset-8 border-2 border-green-400/30 rounded-full animate-ping"></div>
+                          <div className="absolute -inset-12 border border-green-400/20 rounded-full animate-ping" style={{animationDelay: '0.5s'}}></div>
                         </div>
                       </div>
                     ) : (
                       <div className="flex items-center justify-center">
-                        <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center animate-pulse">
-                          <span className="text-2xl animate-spin">⚡</span>
+                        <div className="relative">
+                          <div className="w-24 h-24 glass-strong border-2 border-blue-400/60 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-600/20 flex items-center justify-center animate-pulse glow-blue">
+                            <span className="text-4xl animate-spin">⚡</span>
+                          </div>
+                          <div className="absolute -inset-8 border-2 border-blue-400/30 rounded-full animate-ping"></div>
                         </div>
                       </div>
                     )}
                     
                     <div>
-                      <h3 className="text-xl font-semibold mb-2">
-                        {isAnalyzing ? 'Analyzing Your Assessment' : 
-                         transitionMessage.includes('📞') ? 'Prepare for Screening Call' :
-                         'Moving to Next Step'}
-                      </h3>
-                      <p className="text-muted-foreground">{transitionMessage}</p>
+                      <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                        {isAnalyzing ? '🔥 AI BATTLE MODE' : 
+                         transitionMessage.includes('📞') ? '☎️ CALL TIME!' :
+                         '✨ LEVEL UP!'}
+                      </h2>
+                      <p className="text-lg text-gray-300 leading-relaxed animate-pulse">{transitionMessage}</p>
                       
                       {isAnalyzing && (
-                        <div className="mt-4 space-y-2">
-                          <div className="flex justify-center items-center space-x-1">
-                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        <div className="mt-6 space-y-4">
+                          <div className="flex justify-center items-center space-x-2">
+                            <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-bounce"></div>
+                            <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                            <div className="w-3 h-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full animate-bounce" style={{animationDelay: '0.4s'}}></div>
                           </div>
-                          <p className="text-sm text-muted-foreground">Processing your responses...</p>
+                          <p className="text-sm text-purple-300 animate-pulse font-semibold">AI neurons firing at lightspeed... ⚡</p>
                         </div>
                       )}
                     </div>
@@ -463,11 +472,34 @@ const Screen = () => {
           )}
           
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-4 mb-6">
-              <TabsTrigger value="scorecard"><Target className="w-4 h-4 mr-2" />1. Score Card</TabsTrigger>
-              <TabsTrigger value="red-flags" disabled={!scorecardCompleted}><Flag className="w-4 h-4 mr-2" />2. Red Flags</TabsTrigger>
-              <TabsTrigger value="call" disabled={!redFlagsCompleted}><Phone className="w-4 h-4 mr-2" />3. Screening Calls</TabsTrigger>
-              <TabsTrigger value="ai-results" disabled={!callSimCompleted}><Trophy className="w-4 h-4 mr-2" />4. AI Results</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-4 mb-6 glass-strong border-2 border-purple-400/30 bg-gradient-to-r from-purple-900/20 to-cyan-900/20 p-2 rounded-2xl">
+              <TabsTrigger 
+                value="scorecard"
+                className="data-[state=active]:glass-strong data-[state=active]:border-2 data-[state=active]:border-blue-400/60 data-[state=active]:glow-blue data-[state=active]:text-blue-300 hover:glow-blue transition-all duration-300"
+              >
+                <Target className="w-4 h-4 mr-2" />1. 🎯 Score Battle
+              </TabsTrigger>
+              <TabsTrigger 
+                value="red-flags" 
+                disabled={!scorecardCompleted}
+                className="data-[state=active]:glass-strong data-[state=active]:border-2 data-[state=active]:border-red-400/60 data-[state=active]:glow-red data-[state=active]:text-red-300 hover:glow-red transition-all duration-300 disabled:opacity-50"
+              >
+                <Flag className="w-4 h-4 mr-2" />2. 🚩 Flag Hunt
+              </TabsTrigger>
+              <TabsTrigger 
+                value="call" 
+                disabled={!redFlagsCompleted}
+                className="data-[state=active]:glass-strong data-[state=active]:border-2 data-[state=active]:border-green-400/60 data-[state=active]:glow-green data-[state=active]:text-green-300 hover:glow-green transition-all duration-300 disabled:opacity-50"
+              >
+                <Phone className="w-4 h-4 mr-2" />3. 📞 Call Time
+              </TabsTrigger>
+              <TabsTrigger 
+                value="ai-results" 
+                disabled={!callSimCompleted}
+                className="data-[state=active]:glass-strong data-[state=active]:border-2 data-[state=active]:border-purple-400/60 data-[state=active]:glow-purple data-[state=active]:text-purple-300 hover:glow-purple transition-all duration-300 disabled:opacity-50"
+              >
+                <Trophy className="w-4 h-4 mr-2" />4. 🏆 AI Battle
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="scorecard">

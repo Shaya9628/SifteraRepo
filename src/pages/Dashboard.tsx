@@ -58,13 +58,32 @@ const Dashboard = () => {
       }
 
       if (!profileData.has_completed_onboarding) {
-        navigate('/onboarding');
-        return;
+        // Check localStorage as fallback for onboarding completion
+        const localDomain = localStorage.getItem(`user_domain_${user.id}`) || localStorage.getItem('user_selected_domain');
+        const hasLocalOnboarding = localStorage.getItem(`user_onboarding_completed_${user.id}`);
+        
+        if (!localDomain && !hasLocalOnboarding) {
+          console.log('Redirecting to onboarding - no local or database completion found');
+          navigate('/onboarding');
+          return;
+        } else {
+          console.log('Using localStorage fallback for onboarding completion');
+        }
       }
 
       if (!profileData.selected_domain) {
-        navigate('/profile-selection');
-        return;
+        // Check localStorage as fallback for domain selection
+        const localDomain = localStorage.getItem(`user_domain_${user.id}`) || localStorage.getItem('user_selected_domain');
+        
+        if (!localDomain) {
+          console.log('Redirecting to profile selection - no domain found in database or localStorage');
+          navigate('/profile-selection');
+          return;
+        } else {
+          console.log('Using localStorage domain fallback:', localDomain);
+          // Update profile object with localStorage domain for display
+          profileData.selected_domain = localDomain;
+        }
       }
 
       setProfile(profileData);

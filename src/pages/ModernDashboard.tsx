@@ -323,43 +323,49 @@ const ModernDashboard = () => {
   return (
     <DashboardLayout profile={profile || { full_name: '', total_points: 0 }}>
       <div className="space-y-6">
-        {/* Header with welcome and stats */}
-        <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-6">
-          <div className="flex items-center justify-between">
+        {/* EPIC WELCOME HEADER */}
+        <div className="glass-strong border-2 border-purple-400/40 hover:border-purple-400/60 rounded-2xl p-8 transition-all duration-300 overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-blue-600/10 to-cyan-500/10 animate-gradient"></div>
+          <div className="flex items-center justify-between relative z-10">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">
-                Welcome back, {profile?.full_name || 'User'}!
+              <h1 className="text-4xl font-black bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent mb-2">
+                Welcome back, {profile?.full_name || 'HR Legend'}! 🔥
               </h1>
-              <p className="text-muted-foreground mt-1">
-                Continue your HR assessment journey
+              <p className="text-gray-300 text-lg animate-pulse">
+                Ready to dominate the HR assessment world? ⚡
               </p>
             </div>
-            <div className="flex gap-4 text-center">
-              <div>
-                <p className="text-2xl font-bold text-primary">{profile?.total_points || 0}</p>
-                <p className="text-xs text-muted-foreground">Points</p>
+            <div className="flex gap-6 text-center">
+              <div className="glass-strong border border-purple-400/60 rounded-xl p-4 hover:glow-purple transition-all duration-300">
+                <p className="text-3xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  {profile?.total_points || 0}
+                </p>
+                <p className="text-xs text-purple-300 font-semibold">🏆 POINTS</p>
               </div>
-              <div>
-                <p className="text-2xl font-bold text-primary">{profile?.resumes_screened || 0}</p>
-                <p className="text-xs text-muted-foreground">Screened</p>
+              <div className="glass-strong border border-cyan-400/60 rounded-xl p-4 hover:glow-cyan transition-all duration-300">
+                <p className="text-3xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                  {profile?.resumes_screened || 0}
+                </p>
+                <p className="text-xs text-cyan-300 font-semibold">📝 CRUSHED</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Assessment Progress Stepper */}
+        {/* ASSESSMENT PROGRESS TRACKER */}
         {(hasCompletedFirstAssessment || assessmentProgress) && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="w-5 h-5" />
-                Assessment Progress
+          <Card className="glass-strong border-2 border-green-400/40 hover:border-green-400/60 transition-all duration-300 overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-600/5 via-emerald-600/5 to-teal-500/5 animate-gradient"></div>
+            <CardHeader className="relative z-10">
+              <CardTitle className="flex items-center gap-3 text-2xl bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                <Target className="w-6 h-6 text-green-400 animate-pulse" />
+                ✨ Your Assessment Journey
               </CardTitle>
-              <CardDescription>
-                Track your progress through the 3-stage assessment process
+              <CardDescription className="text-gray-300 text-lg">
+                Track your epic progress through the 3-stage battle system! 🚀
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative z-10">
               <AssessmentStepper 
                 currentStep={getCurrentStep()}
                 completedSteps={getCompletedSteps()}
@@ -368,63 +374,93 @@ const ModernDashboard = () => {
           </Card>
         )}
 
-        {/* Main Content Tabs */}
+        {/* EPIC NAVIGATION TABS */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-4">
-            <TabsTrigger value="start" className="flex items-center gap-1">
+          <TabsList className="grid w-full max-w-lg grid-cols-4 glass-strong border-2 border-purple-400/30 bg-gradient-to-r from-purple-900/20 to-cyan-900/20 p-2 rounded-2xl mx-auto">
+            <TabsTrigger 
+              value="start" 
+              className="data-[state=active]:glass-strong data-[state=active]:border-2 data-[state=active]:border-green-400/60 data-[state=active]:glow-green data-[state=active]:text-green-300 hover:glow-green transition-all duration-300 flex items-center gap-2"
+            >
               <Play className="w-4 h-4" />
-              <span className="hidden sm:inline">Start</span>
+              <span className="font-semibold">🚀 Start</span>
             </TabsTrigger>
-            <TabsTrigger value="upload" className="flex items-center gap-1">
+            <TabsTrigger 
+              value="upload" 
+              className="data-[state=active]:glass-strong data-[state=active]:border-2 data-[state=active]:border-blue-400/60 data-[state=active]:glow-blue data-[state=active]:text-blue-300 hover:glow-blue transition-all duration-300 flex items-center gap-2"
+            >
               <Upload className="w-4 h-4" />
-              <span className="hidden sm:inline">Upload</span>
+              <span className="font-semibold">📁 Upload</span>
             </TabsTrigger>
-            <TabsTrigger value="progress" className="flex items-center gap-1">
+            <TabsTrigger 
+              value="progress" 
+              className="data-[state=active]:glass-strong data-[state=active]:border-2 data-[state=active]:border-purple-400/60 data-[state=active]:glow-purple data-[state=active]:text-purple-300 hover:glow-purple transition-all duration-300 flex items-center gap-2"
+            >
               <TrendingUp className="w-4 h-4" />
-              <span className="hidden sm:inline">Progress</span>
+              <span className="font-semibold">📈 Progress</span>
             </TabsTrigger>
-            <TabsTrigger value="community" className="flex items-center gap-1">
+            <TabsTrigger 
+              value="community" 
+              className="data-[state=active]:glass-strong data-[state=active]:border-2 data-[state=active]:border-yellow-400/60 data-[state=active]:glow-yellow data-[state=active]:text-yellow-300 hover:glow-yellow transition-all duration-300 flex items-center gap-2"
+            >
               <Users className="w-4 h-4" />
-              <span className="hidden sm:inline">Community</span>
+              <span className="font-semibold">🎆 Squad</span>
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="start" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Play className="w-5 h-5" />
-                  Start Assessment
+            <Card className="glass-strong border-2 border-green-400/40 hover:border-green-400/60 transition-all duration-500 overflow-hidden relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-600/10 via-emerald-600/10 to-teal-500/10 animate-gradient"></div>
+              <CardHeader className="relative z-10">
+                <CardTitle className="flex items-center gap-3 text-2xl bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                  <Play className="w-6 h-6 text-green-400 animate-pulse group-hover:animate-bounce" />
+                  🚀 Launch Assessment Battle
                 </CardTitle>
-                <CardDescription>
-                  Begin or continue your HR assessment practice
+                <CardDescription className="text-gray-300 text-lg">
+                  Time to show your HR skills! Ready to dominate? ⚡
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6 relative z-10">
                 {hasCompletedFirstAssessment ? (
-                  <div className="space-y-4">
-                    <p className="text-muted-foreground">
-                      Great job completing your first assessment! Ready for the next challenge?
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <Button onClick={() => setShowNewAssessmentDialog(true)} size="lg" className="flex-1">
-                        <Play className="w-4 h-4 mr-2" />
-                        New Assessment
+                  <div className="space-y-6">
+                    <div className="glass-strong border border-purple-400/40 rounded-xl p-6">
+                      <p className="text-gray-300 text-lg leading-relaxed">
+                        🔥 <span className="font-bold text-purple-400">LEGEND STATUS UNLOCKED!</span> You've crushed your first assessment! Ready for the next level? 🎮
+                      </p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <Button 
+                        onClick={() => setShowNewAssessmentDialog(true)} 
+                        size="lg" 
+                        className="flex-1 glass-strong border-2 border-purple-400/60 hover:glow-purple hover:scale-105 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg py-4 transition-all duration-300"
+                      >
+                        <Play className="w-5 h-5 mr-2 animate-bounce" />
+                        🎯 NEW BATTLE
                       </Button>
-                      <Button variant="outline" onClick={() => setActiveTab('progress')} size="lg" className="flex-1">
-                        <Trophy className="w-4 h-4 mr-2" />
-                        View Progress
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setActiveTab('progress')} 
+                        size="lg" 
+                        className="flex-1 glass-strong border-2 border-yellow-400/60 hover:glow-yellow hover:scale-105 text-yellow-300 border-yellow-400/60 py-4 transition-all duration-300"
+                      >
+                        <Trophy className="w-5 h-5 mr-2" />
+                        🏆 VIEW STATS
                       </Button>
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    <p className="text-muted-foreground">
-                      Start your first assessment to begin building your HR screening skills.
-                    </p>
-                    <Button onClick={startAssessment} size="lg" className="w-full">
-                      <Play className="w-4 h-4 mr-2" />
-                      Start Your First Assessment
+                  <div className="space-y-6">
+                    <div className="glass-strong border border-blue-400/40 rounded-xl p-6">
+                      <p className="text-gray-300 text-lg leading-relaxed">
+                        ✨ Welcome to the <span className="font-bold text-cyan-400">HR Battle Arena!</span> Time to level up your screening skills and become a legend! 🌟
+                      </p>
+                    </div>
+                    <Button 
+                      onClick={startAssessment} 
+                      size="lg" 
+                      className="w-full glass-strong border-2 border-cyan-400/60 hover:glow-cyan hover:scale-105 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold text-xl py-6 transition-all duration-300 animate-pulse"
+                    >
+                      <Play className="w-6 h-6 mr-3 animate-bounce" />
+                      🚀 START YOUR LEGEND JOURNEY
                     </Button>
                   </div>
                 )}

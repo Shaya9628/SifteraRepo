@@ -205,26 +205,30 @@ const CallSimulator = ({ resumeId, candidateName, department, resumeText, onComp
   };
 
   return (
-    <div className="glass rounded-2xl border border-border/50 glow-purple overflow-hidden">
-      {/* Gradient Header */}
-      <div className="bg-gradient-primary p-6">
-        <div className="flex items-center justify-between">
+    <div className="glass-strong rounded-3xl border-2 border-white/10 backdrop-blur-xl glow-purple overflow-hidden hover:glow-cyan transition-all duration-500">
+      {/* Enhanced Gradient Header */}
+      <div className="bg-gradient-to-r from-neon-purple via-neon-pink to-neon-cyan p-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-neon-purple/20 to-neon-cyan/20 animate-gradient" />
+        <div className="relative flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-              <Phone className="w-6 h-6" />
+            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+              <div className="relative">
+                <Phone className="w-7 h-7 animate-pulse" />
+                <div className="absolute -inset-2 bg-white/20 rounded-full animate-ping" />
+              </div>
               Screening Call Simulation
             </h2>
-            <p className="text-white/80 text-sm mt-1">
-              Practice interviewing {candidateName} for {department.replace('_', ' ')}
+            <p className="text-white/80 text-sm mt-2 flex items-center gap-2">
+              ✨ Practice interviewing {candidateName} for {department.replace('_', ' ')}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {isAIGenerated && (
-              <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
-                <Sparkles className="w-3 h-3 mr-1" /> AI Generated
+              <Badge className="glass-strong border-2 border-white/30 text-white backdrop-blur-xl px-3 py-2 animate-float">
+                <Sparkles className="w-3 h-3 mr-2 animate-spin" /> AI Generated
               </Badge>
             )}
-            <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
+            <Badge className="glass-strong border-2 border-white/30 text-white backdrop-blur-xl px-3 py-2 font-bold">
               Q {selectedQuestion + 1} / {currentQuestions.length}
             </Badge>
           </div>
@@ -232,11 +236,14 @@ const CallSimulator = ({ resumeId, candidateName, department, resumeText, onComp
       </div>
 
       <div className="p-6 space-y-6">
-        {/* STAR Method Tip */}
-        <div className="glass rounded-xl p-4 border border-border/30">
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-gradient-primary">
-              <Lightbulb className="w-4 h-4 text-white" />
+        {/* Enhanced STAR Method Tip */}
+        <div className="glass-strong rounded-2xl p-6 border-2 border-amber-400/30 bg-gradient-to-r from-amber-500/10 to-orange-500/10 hover:border-amber-400/50 transition-all duration-300">
+          <div className="flex items-start gap-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 rounded-xl animate-glow-pulse opacity-75" />
+              <div className="relative p-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500">
+                <Lightbulb className="w-5 h-5 text-white animate-bounce" />
+              </div>
             </div>
             <div className="text-sm">
               <p className="font-semibold text-foreground">Behavioral Interviewing (STAR Method)</p>
@@ -282,17 +289,17 @@ const CallSimulator = ({ resumeId, candidateName, department, resumeText, onComp
           )}
         </div>
 
-        {/* Questions */}
+        {/* Enhanced Questions Loading */}
         {questionsLoading || aiLoading ? (
-          <div className="text-center py-12">
-            <div className="relative mx-auto w-16 h-16 mb-4">
-              <div className="absolute inset-0 rounded-full bg-gradient-primary animate-spin opacity-30"></div>
-              <div className="absolute inset-1 rounded-full bg-background flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-primary animate-pulse" />
+          <div className="text-center py-16">
+            <div className="relative mx-auto w-20 h-20 mb-6">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-neon-purple to-neon-cyan animate-spin" />
+              <div className="absolute inset-2 rounded-full bg-black/90 flex items-center justify-center">
+                <Sparkles className="w-8 h-8 text-neon-purple animate-pulse" />
               </div>
             </div>
-            <p className="text-muted-foreground font-medium">
-              {aiLoading ? '✨ AI is crafting tailored questions...' : 'Loading questions...'}
+            <p className="text-white/80 font-medium text-lg animate-pulse">
+              {aiLoading ? '✨ AI is crafting tailored questions...' : '🚀 Loading questions...'}
             </p>
           </div>
         ) : currentQuestions.length === 0 ? (
@@ -300,27 +307,32 @@ const CallSimulator = ({ resumeId, candidateName, department, resumeText, onComp
             <p className="text-muted-foreground">No {questionType} questions available</p>
           </div>
         ) : (
-          <div className="glass rounded-xl p-6 border border-border/30 space-y-4">
+          <div className="glass-strong rounded-2xl p-6 border-2 border-white/20 space-y-6 bg-gradient-to-br from-neon-purple/5 to-neon-cyan/5">
             <div>
-              <Label className="text-base font-bold text-gradient">Question {selectedQuestion + 1}</Label>
-              <p className="text-lg mt-2 text-foreground leading-relaxed">{currentQuestion}</p>
+              <Label className="text-lg font-bold text-gradient-neon animate-gradient flex items-center gap-2">
+                <Phone className="w-4 h-4 text-neon-cyan animate-pulse" />
+                Question {selectedQuestion + 1}
+              </Label>
+              <p className="text-xl mt-3 text-white leading-relaxed font-medium">{currentQuestion}</p>
               {currentQuestions[selectedQuestion]?.hint && (
-                <p className="text-sm text-muted-foreground mt-3 italic flex items-start gap-2">
-                  <Lightbulb className="w-4 h-4 mt-0.5 text-primary shrink-0" />
-                  {currentQuestions[selectedQuestion].hint}
-                </p>
+                <div className="mt-4 glass border border-amber-400/30 rounded-xl p-4 bg-gradient-to-r from-amber-500/10 to-orange-500/10">
+                  <p className="text-sm text-white/80 flex items-start gap-3">
+                    <Lightbulb className="w-4 h-4 mt-0.5 text-amber-400 animate-pulse shrink-0" />
+                    <span className="italic">{currentQuestions[selectedQuestion].hint}</span>
+                  </p>
+                </div>
               )}
             </div>
-            {/* Question Nav Dots */}
+            {/* Enhanced Question Nav Pills */}
             <div className="flex gap-2 flex-wrap">
               {currentQuestions.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => { setSelectedQuestion(idx); setAnswer(''); setScore(5); setFeedback(''); }}
-                  className={`w-9 h-9 rounded-full text-sm font-bold transition-all duration-300 ${
+                  className={`w-10 h-10 rounded-full text-sm font-bold transition-all duration-300 hover:scale-110 ${
                     idx === selectedQuestion
-                      ? 'bg-gradient-primary text-white glow-purple scale-110'
-                      : 'glass border border-border/50 text-muted-foreground hover:text-foreground hover:scale-105'
+                      ? 'glass-strong border-2 border-neon-purple bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-lg glow-purple animate-pulse'
+                      : 'glass border border-white/30 text-white/70 hover:text-white hover:border-neon-purple/50 hover:glow-purple'
                   }`}
                 >
                   {idx + 1}
@@ -337,8 +349,7 @@ const CallSimulator = ({ resumeId, candidateName, department, resumeText, onComp
             placeholder="Record or imagine the candidate's answer here..."
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
-            rows={5}
-            className="glass border-border/50 focus:glow-purple transition-shadow"
+            className="min-h-[100px] glass-strong border border-white/20 text-white placeholder:text-white/50 focus:border-neon-cyan focus:glow-cyan transition-all duration-300"
           />
         </div>
 
@@ -367,27 +378,39 @@ const CallSimulator = ({ resumeId, candidateName, department, resumeText, onComp
           </div>
         </div>
 
-        {/* Notes */}
-        <div className="space-y-2">
-          <Label className="font-semibold">Interviewer Notes</Label>
+        {/* Enhanced Notes Section */}
+        <div className="space-y-3">
+          <Label className="text-lg font-bold text-white flex items-center gap-2">
+            <RefreshCw className="w-4 h-4 text-neon-cyan animate-spin" />
+            Interviewer Notes
+          </Label>
           <Textarea
-            placeholder="Add notes about STAR method, red flags, or follow-up questions..."
+            placeholder="✨ Add insights about STAR method, red flags, or brilliant follow-up questions..."
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             rows={4}
-            className="glass border-border/50 focus:glow-purple transition-shadow"
-          />
+            className="glass-strong border-2 border-neon-cyan/30 focus:border-neon-cyan focus:glow-cyan bg-black/20 text-white placeholder:text-white/50 resize-none transition-all duration-300"
+          />  
         </div>
 
-        {/* Submit */}
+        {/* Enhanced Submit Button */}
         <Button
           onClick={handleSubmit}
           disabled={saving || !answer.trim()}
           size="lg"
-          className="w-full bg-gradient-primary hover:opacity-90 text-white font-bold text-base glow-purple transition-all duration-300"
+          className="w-full glass-strong border-2 border-neon-purple hover:glow-purple hover:scale-105 transition-all duration-300 bg-gradient-to-r from-neon-purple via-neon-pink to-neon-cyan text-white font-bold text-lg py-4 group"
         >
-          <Send className="w-4 h-4 mr-2" />
-          {saving ? 'Saving...' : 'Submit & Complete'}
+          {saving ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3" />
+              Saving Magic...
+            </>
+          ) : (
+            <>
+              <Send className="w-5 h-5 mr-3 group-hover:animate-bounce" />
+              Submit & Complete ✨
+            </>
+          )}
         </Button>
       </div>
     </div>

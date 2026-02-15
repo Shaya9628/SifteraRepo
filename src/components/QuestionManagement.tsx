@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Edit2, Save, X, Target, Flag, Phone, Trash2, Building2, Users } from 'lucide-react';
+import { GLOBAL_DOMAINS, Domain } from '@/lib/constants/domains';
 
 interface Question {
   id: string;
@@ -25,7 +26,7 @@ interface Question {
 }
 
 type StageType = 'scorecard' | 'red_flags' | 'screening_calls';
-type DomainType = 'Sales' | 'CRM';
+type DomainType = Domain;
 
 const STAGE_LABELS = {
   scorecard: { label: 'Score Card', icon: Target },
@@ -33,17 +34,23 @@ const STAGE_LABELS = {
   screening_calls: { label: 'Screening Calls', icon: Phone },
 };
 
-const DOMAIN_LABELS = {
-  Sales: { label: 'Sales', icon: Building2, color: 'bg-blue-500' },
-  CRM: { label: 'CRM', icon: Users, color: 'bg-green-500' },
-};
+// Create dynamic domain labels from global domains
+const DOMAIN_LABELS = GLOBAL_DOMAINS.reduce((acc, domain) => ({
+  ...acc,
+  [domain.value]: {
+    label: domain.label,
+    icon: Building2, // Default icon, can be customized per domain
+    color: 'bg-purple-500', // Modern Gen Z purple default
+    emoji: domain.icon
+  }
+}), {} as Record<Domain, { label: string; icon: any; color: string; emoji: string }>);
 
 export const QuestionManagement = () => {
   const { toast } = useToast();
   const [questions, setQuestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeStage, setActiveStage] = useState<StageType>('scorecard');
-  const [activeDomain, setActiveDomain] = useState<DomainType>('Sales');
+  const [activeDomain, setActiveDomain] = useState<DomainType>('sales');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
 

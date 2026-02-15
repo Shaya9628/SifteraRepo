@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-
-export type Domain = 'Sales' | 'CRM';
+import { Domain } from '@/lib/constants/domains';
 
 interface DomainContextType {
   currentDomain: Domain;
@@ -22,7 +21,7 @@ interface DomainProviderProps {
 
 export const DomainProvider: React.FC<DomainProviderProps> = ({ children }) => {
   const { user } = useAuth();
-  const [currentDomain, setCurrentDomainState] = useState<Domain>('Sales');
+  const [currentDomain, setCurrentDomainState] = useState<Domain>('sales');
   const [domainSettings, setDomainSettings] = useState({
     allow_user_domain_change: true,
     allow_admin_domain_change: true,
@@ -38,7 +37,7 @@ export const DomainProvider: React.FC<DomainProviderProps> = ({ children }) => {
     // Load user's domain from localStorage
     if (user) {
       const userDomain = localStorage.getItem(`user_domain_${user.id}`) as Domain || 'Sales';
-      setCurrentDomainState(userDomain);
+      setCurrentDomainState(userDomain.toLowerCase() as Domain || 'sales');
     }
 
     // Listen for domain changes

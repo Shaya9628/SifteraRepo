@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import { GLOBAL_DOMAINS } from '@/lib/constants/domains';
 import { 
   Upload, 
   FileText, 
@@ -22,7 +23,8 @@ import {
   Globe,
   User,
   Play,
-  Rocket
+  Rocket,
+  Briefcase
 } from 'lucide-react';
 import {
   Dialog,
@@ -36,8 +38,8 @@ interface UploadFile {
   id: string;
   file: File;
   candidateName: string;
-  department: string;
-  domain: string;
+  position: string;
+  seniority_level: string;
   status: 'pending' | 'uploading' | 'success' | 'error';
   progress: number;
   error?: string;
@@ -50,8 +52,8 @@ interface UserResumeUploadProps {
 interface ExistingResume {
   id: string;
   candidate_name: string;
-  department: string;
-  domain: string | null;
+  position?: string;
+  seniority_level?: string;
   uploaded_at: string;
   status: string | null;
 }
@@ -59,6 +61,36 @@ interface ExistingResume {
 const ALLOWED_FILE_TYPES = ['.pdf', '.doc', '.docx'];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_RESUMES_PER_USER = 2;
+
+// Position options for assessment
+const POSITION_OPTIONS = [
+  'Account Manager', 'Sales Representative', 'Business Development Manager',
+  'Marketing Manager', 'Digital Marketing Specialist', 'Content Creator',
+  'Financial Analyst', 'Accountant', 'Treasury Manager',
+  'HR Generalist', 'Talent Acquisition Specialist', 'Training Manager',
+  'Software Developer', 'System Administrator', 'Data Analyst',
+  'Operations Manager', 'Project Manager', 'Process Specialist',
+  'Nurse', 'Healthcare Administrator', 'Clinical Coordinator',
+  'Teacher', 'Training Specialist', 'Curriculum Developer',
+  'Engineer', 'Technical Lead', 'Quality Assurance',
+  'Consultant', 'Business Analyst', 'Strategy Manager',
+  'Store Manager', 'Customer Service Rep', 'Merchandiser',
+  'Production Manager', 'Quality Control', 'Logistics Coordinator',
+  'Legal Counsel', 'Compliance Officer', 'Paralegal',
+  'Hotel Manager', 'Event Coordinator', 'Guest Services',
+  'Supply Chain Analyst', 'Warehouse Manager', 'Logistics Specialist',
+  'Real Estate Agent', 'Property Manager', 'Leasing Consultant',
+  'Content Writer', 'Social Media Manager', 'Communications Specialist',
+  'Program Manager', 'Community Outreach', 'Fundraising Coordinator',
+  'General Manager', 'Team Lead', 'Specialist'
+];
+
+const LEVEL_OPTIONS = [
+  { value: 'junior', label: 'Junior Level (0-2 years)' },
+  { value: 'mid', label: 'Mid Level (3-5 years)' },
+  { value: 'senior', label: 'Senior Level (6-10 years)' },
+  { value: 'executive', label: 'Executive Level (10+ years)' }
+];
 
 export const UserResumeUpload = ({ onUploadComplete }: UserResumeUploadProps) => {
   const { user } = useAuth();
@@ -70,8 +102,9 @@ export const UserResumeUpload = ({ onUploadComplete }: UserResumeUploadProps) =>
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [existingResumes, setExistingResumes] = useState<ExistingResume[]>([]);
   const [existingResumesLoading, setExistingResumesLoading] = useState(false);
-  const [defaultDepartment, setDefaultDepartment] = useState('');
-  const [defaultDomain, setDefaultDomain] = useState('');
+  const [defaultPosition, setDefaultPosition] = useState('');
+  const [defaultLevel, setDefaultLevel] = useState('');
+  const [userDomain, setUserDomain] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadCount, setUploadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -80,26 +113,118 @@ export const UserResumeUpload = ({ onUploadComplete }: UserResumeUploadProps) =>
 
   const fetchExistingResumes = useCallback(async () => {
     if (!user) return;
+    setLoading(true);
     setExistingResumesLoading(true);
-
+    
     try {
-      const { data, error } = await supabase
-        .from('resumes')
-        .select('id,candidate_name,department,domain,uploaded_at,status')
-        .eq('user_id', user.id)
-        .order('uploaded_at', { ascending: false });
+      // Get user's selected domain from profile/localStorage
+      let selectedDomain = '';
+      
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('selected_domain')
+          .eq('id', user.id)
+          .single();
+        
+        selectedDomain = profile?.selected_domain || '';
+      } catch (profileError) {
+        console.log('Database profile check failed, using localStorage:', profileError);
+      }
+      
+      // Fallback to localStorage
+      if (!selectedDomain) {
+        selectedDomain = localStorage.getItem(`user_domain_${user.id}`) || localStorage.getItem('user_selected_domain') || 'general';
+      }
+      
+      setUserDomain(selectedDomain);
+      console.log('User domain loaded:', selectedDomain);
 
-      if (error) throw error;
-      setExistingResumes((data as ExistingResume[]) || []);
+      // Load existing resumes with robust schema handling
+      let resumeData = [];
+      
+      try {
+        // Try modern schema first (with position and seniority_level)
+        const { data: modernData, error: modernError } = await supabase
+          .from('resumes')
+          .select('id,candidate_name,position,seniority_level,uploaded_at,status')
+          .eq('user_id', user.id)
+          .order('uploaded_at', { ascending: false });
+
+        if (!modernError) {
+          resumeData = modernData || [];
+          console.log('Loaded resumes with modern schema:', resumeData.length);
+        } else if (modernError.message?.includes('column') || modernError.message?.includes('position')) {
+          // Column doesn't exist, try legacy schema
+          console.log('Modern columns not available, trying legacy schema');
+          
+          const { data: legacyData, error: legacyError } = await supabase
+            .from('resumes')
+            .select('id,candidate_name,department,domain,uploaded_at,status')
+            .eq('user_id', user.id)
+            .order('uploaded_at', { ascending: false });
+
+          if (!legacyError) {
+            // Map legacy data to modern format
+            resumeData = (legacyData || []).map((resume: any) => ({
+              ...resume,
+              position: resume.department === 'sales' ? 'Sales Representative' : 'Customer Support Rep',
+              seniority_level: 'mid'
+            }));
+            console.log('Loaded resumes with legacy schema:', resumeData.length);
+          } else {
+            throw legacyError;
+          }
+        } else {
+          throw modernError;
+        }
+      } catch (schemaError) {
+        console.log('Both schema attempts failed, trying minimal schema');
+        
+        // Last resort: basic columns that should always exist
+        const { data: basicData, error: basicError } = await supabase
+          .from('resumes')  
+          .select('id,candidate_name,uploaded_at,status')
+          .eq('user_id', user.id)
+          .order('uploaded_at', { ascending: false });
+
+        if (basicError) throw basicError;
+        
+        // Map basic data to expected format
+        resumeData = (basicData || []).map((resume: any) => ({
+          ...resume,
+          position: 'Position not specified',
+          seniority_level: 'mid'
+        }));
+        console.log('Loaded resumes with basic schema:', resumeData.length);
+      }
+
+      setExistingResumes(resumeData as ExistingResume[]);
+      const uploadCount = resumeData.length;
+      setUploadCount(uploadCount);
+      console.log('Resume loading completed successfully. Found:', uploadCount, 'resumes');
     } catch (error: any) {
-      console.error('Error fetching resumes:', error);
-      toast({
-        title: 'Could not load your resumes',
-        description: error?.message || 'Please try again.',
-        variant: 'destructive',
-      });
+      console.error('Error loading resumes:', error);
+      // Fallback to localStorage for domain but don't fail the component
+      const localDomain = localStorage.getItem(`user_domain_${user.id}`) || localStorage.getItem('user_selected_domain') || 'general';
+      setUserDomain(localDomain);
+      
+      // Set empty resume list instead of showing error toast  
+      setExistingResumes([]);
+      setUploadCount(0);
+      
+      console.log('Resume loading failed, but continuing with empty list. Error:', error.message);
+      // Only show toast for non-schema related errors
+      if (!error.message?.includes('column') && !error.message?.includes('position')) {
+        toast({
+          title: 'Could not load existing resumes',
+          description: 'You can still upload new resumes. Previous uploads may not be visible.',
+          variant: 'default',
+        });
+      }
     } finally {
       setExistingResumesLoading(false);
+      setLoading(false);
     }
   }, [toast, user]);
 
@@ -156,13 +281,6 @@ export const UserResumeUpload = ({ onUploadComplete }: UserResumeUploadProps) =>
 
   const sanitizeFilename = (filename: string): string => {
     return filename.replace(/[^a-zA-Z0-9\-_\.]/g, '_').replace(/_{2,}/g, '_');
-  };
-
-  const normalizeDepartment = (value: string): 'sales' | 'customer_support' => {
-    const compact = value.trim().toLowerCase().replace(/[^a-z]/g, '');
-    if (compact === 'sales') return 'sales';
-    if (compact === 'customersupport') return 'customer_support';
-    throw new Error('Invalid department. Please select Sales or Customer Support.');
   };
 
   const handleFiles = (newFiles: FileList | File[]) => {
@@ -223,8 +341,8 @@ export const UserResumeUpload = ({ onUploadComplete }: UserResumeUploadProps) =>
         id: generateFileId(),
         file,
         candidateName,
-        department: defaultDepartment || 'sales',
-        domain: defaultDomain || 'sales',
+        position: defaultPosition || '',
+        seniority_level: defaultLevel || 'mid',
         status: 'pending',
         progress: 0,
       });
@@ -252,7 +370,7 @@ export const UserResumeUpload = ({ onUploadComplete }: UserResumeUploadProps) =>
     if (droppedFiles.length > 0) {
       handleFiles(droppedFiles);
     }
-  }, [files, uploadCount, defaultDepartment, defaultDomain]);
+  }, [files, uploadCount, defaultPosition, defaultLevel]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -299,8 +417,8 @@ export const UserResumeUpload = ({ onUploadComplete }: UserResumeUploadProps) =>
 
     try {
       // Validate required fields
-      if (!uploadFile.candidateName.trim() || !uploadFile.department || !uploadFile.domain) {
-        throw new Error('Missing required information');
+      if (!uploadFile.candidateName.trim() || !uploadFile.position || !uploadFile.seniority_level) {
+        throw new Error('Missing required information: candidate name, position, and experience level');
       }
 
       const fileExt = uploadFile.file.name.split('.').pop();
@@ -318,19 +436,29 @@ export const UserResumeUpload = ({ onUploadComplete }: UserResumeUploadProps) =>
 
       updateFile(uploadFile.id, { progress: 50 });
 
-      const normalizedDepartment = normalizeDepartment(uploadFile.department);
-
       // Insert record into database and get the resume ID
+      const insertData: any = {
+        user_id: user!.id,
+        candidate_name: uploadFile.candidateName.trim(),
+        file_path: fileName,
+        is_pool_resume: false, // Users cannot add to pool
+      };
+      
+      // Add columns that exist in the schema
+      if (uploadFile.position) insertData.position = uploadFile.position;
+      if (uploadFile.seniority_level) insertData.seniority_level = uploadFile.seniority_level;
+      if (userDomain) insertData.domain = userDomain;
+      
+      // Fallback to department if domain column doesn't exist
+      if (!userDomain && uploadFile.position) {
+        // Map position to old department system as fallback
+        const salesPositions = ['Account Manager', 'Sales Representative', 'Business Development Manager'];
+        insertData.department = salesPositions.includes(uploadFile.position) ? 'sales' : 'customer_support';
+      }
+
       const { data: insertedResume, error: dbError } = await supabase
         .from('resumes')
-        .insert({
-          user_id: user!.id,
-          candidate_name: uploadFile.candidateName.trim(),
-          department: normalizedDepartment,
-          domain: uploadFile.domain,
-          file_path: fileName,
-          is_pool_resume: false, // Users cannot add to pool
-        })
+        .insert(insertData)
         .select('id')
         .single();
 
@@ -379,13 +507,13 @@ export const UserResumeUpload = ({ onUploadComplete }: UserResumeUploadProps) =>
 
     // Validate all files have required information
     const invalidFiles = files.filter(f => 
-      !f.candidateName.trim() || !f.department || !f.domain
+      !f.candidateName.trim() || !f.position || !f.seniority_level
     );
 
     if (invalidFiles.length > 0) {
       toast({
         title: 'Missing information',
-        description: 'Please fill in all required fields for all files',
+        description: 'Please fill in candidate name, position, and experience level for all files',
         variant: 'destructive',
       });
       return;
@@ -451,10 +579,9 @@ export const UserResumeUpload = ({ onUploadComplete }: UserResumeUploadProps) =>
     navigate(`/screen/${resumeId}`);
   };
 
-  const formatDepartmentLabel = (dept: string) => {
-    if (dept === 'customer_support') return 'Customer Support';
-    if (dept === 'sales') return 'Sales';
-    return dept;
+  const formatLevelLabel = (level: string) => {
+    const found = LEVEL_OPTIONS.find(l => l.value === level);
+    return found ? found.label : level;
   };
 
   const getStatusIcon = (status: UploadFile['status']) => {
@@ -594,9 +721,13 @@ export const UserResumeUpload = ({ onUploadComplete }: UserResumeUploadProps) =>
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
                       <div className="font-medium">{r.candidate_name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {formatDepartmentLabel(r.department)}
-                        {r.domain ? ` • ${r.domain.toUpperCase()}` : ''}
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Badge variant="outline" className="text-xs">
+                          {r.position || 'General Position'}
+                        </Badge>
+                        <Badge variant="secondary" className="text-xs">
+                          {formatLevelLabel(r.seniority_level || 'mid')}
+                        </Badge>
                       </div>
                     </div>
 
@@ -618,38 +749,63 @@ export const UserResumeUpload = ({ onUploadComplete }: UserResumeUploadProps) =>
 
         {!isUploadDisabled && (
           <>
-            {/* Default settings */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
-              <div className="space-y-2">
-                <Label className="text-sm font-medium flex items-center gap-2">
-                  <Building className="w-4 h-4" />
-                  Department *
-                </Label>
-                <Select value={defaultDepartment} onValueChange={setDefaultDepartment}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select department" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="sales">Sales</SelectItem>
-                    <SelectItem value="customer_support">Customer Support</SelectItem>
-                  </SelectContent>
-                </Select>
+            {/* Assessment settings */}
+            <div className="p-4 bg-muted/50 rounded-lg space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h3 className="text-sm font-medium flex items-center gap-2">
+                    <Globe className="w-4 h-4" />
+                    Assessment Domain
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-primary/10 text-primary">
+                      {userDomain ? GLOBAL_DOMAINS.find(d => d.value === userDomain)?.label || userDomain.toUpperCase() : 'Loading...'}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      (Selected from your profile)
+                    </span>
+                  </div>
+                </div>
               </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium flex items-center gap-2">
+                    <Briefcase className="w-4 h-4" />
+                    Default Position *
+                  </Label>
+                  <Select value={defaultPosition} onValueChange={setDefaultPosition}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select position to assess for" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {POSITION_OPTIONS.map(position => (
+                        <SelectItem key={position} value={position}>
+                          {position}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm font-medium flex items-center gap-2">
-                  <Globe className="w-4 h-4" />
-                  Domain *
-                </Label>
-                <Select value={defaultDomain} onValueChange={setDefaultDomain}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select domain" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="sales">Sales</SelectItem>
-                    <SelectItem value="crm">CRM</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    Default Experience Level *
+                  </Label>
+                  <Select value={defaultLevel} onValueChange={setDefaultLevel}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select experience level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {LEVEL_OPTIONS.map(level => (
+                        <SelectItem key={level.value} value={level.value}>
+                          {level.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
@@ -781,33 +937,39 @@ export const UserResumeUpload = ({ onUploadComplete }: UserResumeUploadProps) =>
                           </div>
 
                           <div className="space-y-1">
-                            <Label className="text-xs">Department *</Label>
+                            <Label className="text-xs">Position *</Label>
                             <Select
-                              value={file.department}
-                              onValueChange={(value) => updateFile(file.id, { department: value })}
+                              value={file.position}
+                              onValueChange={(value) => updateFile(file.id, { position: value })}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Select department" />
+                                <SelectValue placeholder="Select position" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="sales">Sales</SelectItem>
-                                <SelectItem value="customer_support">Customer Support</SelectItem>
+                                {POSITION_OPTIONS.map(position => (
+                                  <SelectItem key={position} value={position}>
+                                    {position}
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                           </div>
 
-                          <div className="space-y-1 md:col-span-2">
-                            <Label className="text-xs">Domain *</Label>
+                          <div className="space-y-1">
+                            <Label className="text-xs">Experience Level *</Label>
                             <Select
-                              value={file.domain}
-                              onValueChange={(value) => updateFile(file.id, { domain: value })}
+                              value={file.seniority_level}
+                              onValueChange={(value) => updateFile(file.id, { seniority_level: value })}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Select domain" />
+                                <SelectValue placeholder="Select level" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="sales">Sales</SelectItem>
-                                <SelectItem value="crm">CRM</SelectItem>
+                                {LEVEL_OPTIONS.map(level => (
+                                  <SelectItem key={level.value} value={level.value}>
+                                    {level.label}
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                           </div>
@@ -825,7 +987,7 @@ export const UserResumeUpload = ({ onUploadComplete }: UserResumeUploadProps) =>
         {!isUploadDisabled && (
           <Button
             onClick={handleUpload}
-            disabled={files.length === 0 || isUploading || !defaultDepartment || !defaultDomain}
+            disabled={files.length === 0 || isUploading || !defaultPosition || !defaultLevel}
             className="w-full"
             size="lg"
           >

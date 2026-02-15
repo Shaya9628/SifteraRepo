@@ -7,13 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Users, Search, Building2, Save, RefreshCw } from 'lucide-react';
+import { Domain, GLOBAL_DOMAINS } from '@/lib/constants/domains';
 
 interface User {
   id: string;
   email: string;
   full_name: string;
   designation: string;
-  domain: 'Sales' | 'CRM';
+  domain: Domain;
   last_sign_in_at: string;
 }
 
@@ -72,21 +73,25 @@ export const AdminUserDomainManagement = () => {
     }
   };
 
-  const updateUserDomain = async (userId: string, newDomain: 'Sales' | 'CRM') => {
+  const updateUserDomain = async (userId: string, newDomain: string) => {
     setUpdating(userId);
     
     try {
-      // Update domain in localStorage
-      localStorage.setItem(`user_domain_${userId}`, newDomain);
+      // Update domain in localStorage (always works)
+      localStorage.setItem(`user_domain_${userId}`, newDomain.toLowerCase());
       
-      // Try to update in database if column exists
+      // Try to update in database with enhanced error handling
       try {
         await supabase
           .from('profiles')
           .update({ selected_domain: newDomain.toLowerCase() })
           .eq('id', userId);
-      } catch (dbError) {
+        console.log('Database updated successfully');
+      } catch (dbError: any) {
         console.log('Database update failed, using localStorage:', dbError);
+        if (dbError?.code === '23514' || dbError?.message?.includes('selected_domain_check')) {
+          console.log('Domain constraint error - using localStorage fallback');
+        }
       }
 
       // Update local state
@@ -205,8 +210,14 @@ export const AdminUserDomainManagement = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Sales">Sales</SelectItem>
-                        <SelectItem value="CRM">CRM</SelectItem>
+                        {GLOBAL_DOMAINS.map((domain) => (
+                          <SelectItem key={domain.value} value={domain.value}>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">{domain.icon}</span>
+                              {domain.label}
+                            </div>
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
 

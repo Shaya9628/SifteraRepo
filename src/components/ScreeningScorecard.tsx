@@ -8,7 +8,7 @@ import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Trophy, Save } from 'lucide-react';
+import { Trophy, Save, Sparkles, Target, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { evaluateAndAwardBadges } from '@/lib/badgeEvaluation';
 
@@ -190,26 +190,37 @@ const ScreeningScorecard = ({ resumeId, challengeMode, onComplete }: ScorecardPr
   };
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="glass-strong border-2 border-white/10 backdrop-blur-xl">
+      <CardHeader className="bg-gradient-to-r from-neon-purple/20 to-neon-pink/20 rounded-t-lg border-b border-white/10">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Resume Screening Scorecard</CardTitle>
-            <CardDescription>
-              Score each criterion based on HR best practices
+            <CardTitle className="text-gradient-neon animate-gradient flex items-center gap-2">
+              <Target className="w-6 h-6 text-neon-purple animate-pulse" />
+              Resume Screening Scorecard
+            </CardTitle>
+            <CardDescription className="text-white/70 mt-2">
+              ✨ Score each criterion with precision - your assessment shapes the future!
             </CardDescription>
           </div>
-          <Badge variant="secondary" className="text-xl px-4 py-2 flex items-center">
-            <Trophy className="w-5 h-5 mr-2" />
-            {totalScore.toFixed(1)}
-          </Badge>
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-neon-purple to-neon-pink rounded-full animate-glow-pulse" />
+            <Badge className="relative glass-strong border-2 border-white/30 text-xl px-6 py-3 flex items-center bg-gradient-to-r from-neon-purple/80 to-neon-pink/80 text-white animate-float">
+              <Trophy className="w-5 h-5 mr-2 animate-bounce" />
+              <span className="font-bold text-2xl">{totalScore.toFixed(1)}</span>
+            </Badge>
+          </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-8">
+      <CardContent className="space-y-8 p-6">
         {questionsLoading ? (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading questions...</p>
+          <div className="text-center py-12">
+            <div className="relative mx-auto mb-6">
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-purple to-neon-cyan rounded-full animate-spin" />
+              <div className="relative w-16 h-16 bg-black/90 rounded-full flex items-center justify-center">
+                <Sparkles className="w-8 h-8 text-neon-purple animate-pulse" />
+              </div>
+            </div>
+            <p className="text-white/70 animate-pulse">Loading assessment criteria...</p>
           </div>
         ) : (
           questions.map((question) => {
@@ -217,71 +228,120 @@ const ScreeningScorecard = ({ resumeId, challengeMode, onComplete }: ScorecardPr
             const weighted = calculateWeightedScore(score, question.max_score || 10);
 
             return (
-              <div key={question.id} className="space-y-3">
+              <div key={question.id} className="glass border border-white/20 rounded-2xl p-6 hover:border-neon-purple/50 transition-all duration-300 hover:glow-purple space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <Label className="text-base font-semibold">{question.question_text}</Label>
+                    <Label className="text-lg font-semibold text-white flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-neon-cyan" />
+                      {question.question_text}
+                    </Label>
                     {question.description && (
-                      <p className="text-sm text-muted-foreground mt-1">{question.description}</p>
+                      <p className="text-sm text-white/60 mt-2 leading-relaxed">{question.description}</p>
                     )}
                     {question.hint && (
-                      <p className="text-xs text-muted-foreground mt-1 italic">{question.hint}</p>
+                      <p className="text-xs text-neon-cyan/80 mt-2 italic flex items-center gap-1">
+                        💡 {question.hint}
+                      </p>  
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline">{score}/100</Badge>
-                    {/* <Badge variant="secondary">{weighted.toFixed(1)}/{question.max_score}</Badge> */}
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-neon-purple to-neon-pink rounded-lg animate-glow-pulse opacity-75" />
+                      <Badge className="relative glass border-neon-purple/50 px-3 py-1 text-white font-bold">
+                        {score}/100
+                      </Badge>
+                    </div>
                   </div>
                 </div>
-                <Slider
-                  value={[score]}
-                  onValueChange={([value]) =>
-                    setScores(prev => ({ ...prev, [question.id]: value }))
-                  }
-                  max={100}
-                  step={5}
-                  className="w-full"
-                />
+                <div className="relative">
+                  <Slider
+                    value={[score]}
+                    onValueChange={([value]) =>
+                      setScores(prev => ({ ...prev, [question.id]: value }))
+                    }
+                    max={100}
+                    step={5}
+                    className="w-full slider-glow [&>span]:bg-gradient-to-r [&>span]:from-neon-purple [&>span]:to-neon-pink [&>span]:border-0 [&>.slider-track]:bg-white/20 [&>.slider-range]:bg-gradient-to-r [&>.slider-range]:from-neon-purple [&>.slider-range]:to-neon-pink [&>.slider-thumb]:bg-white [&>.slider-thumb]:border-2 [&>.slider-thumb]:border-neon-purple [&>.slider-thumb]:hover:scale-125 [&>.slider-thumb]:transition-transform"
+                  />
+                  <div className="flex justify-between text-xs text-white/60 mt-2">
+                    <span>Poor</span>
+                    <span>Average</span>
+                    <span>Excellent</span>
+                  </div>
+                </div>
               </div>
             );
           })
         )}
 
-        <div className="space-y-3 pt-4 border-t">
+        <div className="glass border border-white/20 rounded-2xl p-6 space-y-4 bg-gradient-to-r from-neon-pink/10 to-neon-purple/10">
           <div className="flex items-center justify-between">
-            <Label className="text-base font-semibold">Cultural Fit Assessment</Label>
-            <Badge variant="outline">{culturalFit}/100</Badge>
+            <Label className="text-lg font-semibold text-white flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-neon-pink animate-pulse" />
+              Cultural Fit Assessment
+            </Label>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-neon-pink to-neon-purple rounded-lg animate-glow-pulse opacity-75" />
+              <Badge className="relative glass border-neon-pink/50 px-3 py-1 text-white font-bold">
+                {culturalFit}/100
+              </Badge>
+            </div>
           </div>
-          <Slider
-            value={[culturalFit]}
-            onValueChange={([value]) => setCulturalFit(value)}
-            max={100}
-            step={5}
-            className="w-full"
-          />
+          <div className="relative">
+            <Slider
+              value={[culturalFit]}
+              onValueChange={([value]) => setCulturalFit(value)}
+              max={100}
+              step={5}
+              className="w-full slider-glow [&>span]:bg-gradient-to-r [&>span]:from-neon-pink [&>span]:to-neon-purple [&>span]:border-0 [&>.slider-track]:bg-white/20 [&>.slider-range]:bg-gradient-to-r [&>.slider-range]:from-neon-pink [&>.slider-range]:to-neon-purple [&>.slider-thumb]:bg-white [&>.slider-thumb]:border-2 [&>.slider-thumb]:border-neon-pink [&>.slider-thumb]:hover:scale-125 [&>.slider-thumb]:transition-transform"
+            />
+            <div className="flex justify-between text-xs text-white/60 mt-2">
+              <span>Poor Fit</span>
+              <span>Good Match</span>
+              <span>Perfect Fit</span>
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-3 pt-4 border-t">
-          <Label className="text-base font-semibold">Screening Notes</Label>
+        <div className="glass border border-white/20 rounded-2xl p-6 space-y-4 bg-gradient-to-r from-neon-cyan/10 to-neon-lime/10">
+          <Label className="text-lg font-semibold text-white flex items-center gap-2">
+            <Target className="w-5 h-5 text-neon-cyan animate-bounce" />
+            Screening Notes
+          </Label>
           <Textarea
-            placeholder="Add detailed notes about your screening decision..."
+            placeholder="✨ Share your insights about this candidate's potential..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={5}
+            className="glass border-neon-cyan/30 focus:border-neon-cyan focus:glow-cyan bg-black/20 text-white placeholder:text-white/50 resize-none"
           />
         </div>
 
-        <div className="flex items-center justify-between pt-4">
-          <div className="text-sm text-muted-foreground">
+        <div className="flex items-center justify-between pt-6 border-t border-white/20">
+          <div className="text-sm text-white/70">
             {challengeMode && (
-              <span className="text-destructive font-semibold">
-                Challenge Mode Active - Work quickly!
+              <span className="text-neon-orange font-semibold animate-pulse flex items-center gap-2">
+                ⚡ Challenge Mode Active - Work quickly!
               </span>
             )}
           </div>
-          <Button onClick={handleSave} disabled={saving} size="lg">
-            <Save className="w-4 h-4 mr-2" />
-            {saving ? 'Saving...' : 'Submit & Move to Next Round'}
+          <Button 
+            onClick={handleSave} 
+            disabled={saving} 
+            size="lg"
+            className="glass-strong border-2 border-neon-purple hover:glow-purple hover:scale-105 transition-all duration-300 bg-gradient-to-r from-neon-purple via-neon-pink to-neon-cyan text-white font-bold px-8 py-3 text-lg group"
+          >
+            {saving ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-3" />
+                Saving Magic...
+              </>
+            ) : (
+              <>
+                <Save className="w-5 h-5 mr-3 group-hover:animate-bounce" />
+                Submit & Move to Next Round ✨
+              </>
+            )}
           </Button>
         </div>
       </CardContent>
